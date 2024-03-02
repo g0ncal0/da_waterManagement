@@ -2,8 +2,8 @@
 // Created by Filipe Correia on 02/03/2024.
 //
 
-#ifndef PROJECT_MENU_H
-#define PROJECT_MENU_H
+#ifndef WM_MENU_H
+#define WM_MENU_H
 
 #include <string>
 #include <iostream>
@@ -48,4 +48,4 @@ public:
 };
 
 
-#endif //PROJECT_MENU_H
+#endif //WM_MENU_H

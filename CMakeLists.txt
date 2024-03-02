@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(project)
+project(Water Management)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -7,4 +7,5 @@ add_executable(project main.cpp
         parser.cpp
         parser.h
         Menu.cpp
-        Menu.h)
+        Menu.h
+        graph/Graph.h)
