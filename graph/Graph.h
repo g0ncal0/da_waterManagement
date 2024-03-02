@@ -24,6 +24,43 @@ public:
     bool addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
     bool addStation(int id, std::string &code);
 
+    Vertex* findVertex(const std::string& code)
+    {
+        for (size_t i = 0; i <vertexSet.size(); i++)
+        {
+            if (vertexSet[i]->getCode() == code)
+            {
+                return vertexSet[i];
+            }
+            
+        }
+        return NULL;
+    }
+    bool addEdge(const std::string& origin,const std::string& target, double capacity )
+    {
+        auto firstVertex=findVertex(origin);
+        auto secondVertex=findVertex(target);
+        if (secondVertex==NULL||firstVertex==NULL)
+        {
+            return 1;
+        }
+
+
+        
+
+    }
+    bool addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity){
+        auto firstVertex=findVertex(vertexA);
+        auto secondVertex=findVertex(vertexB);
+        if (secondVertex==NULL||firstVertex==NULL)
+        {
+            return 1;
+        }
+
+
+
+    }
+
     bool removeVertex(Vertex* v){
         auto it = std::find(vertexSet.begin(), vertexSet.end(), v);
         if(it == vertexSet.end()){
@@ -48,25 +85,24 @@ protected:
     double dist = 0;
     Edge *path = nullptr;
     std::vector<Edge *> incoming;
-
+    std::string code;
 
 public:
     std::vector<Edge*> getAdj(){return adj;}
-    Vertex(int id){this->id = id;}
+    Vertex(int id,const std::string& code){this->id = id;
+    this->code = code;
+    }
     int getId() const{return id;};
-    virtual char getType(){return 'l';};
-
+    virtual char getType()=0;
+    const std::string& getCode(){return code;}
 
 };
 
 class Station : public Vertex{
-private:
-    int id;
-    std::string code;
 
 public:
-    Station(int id, std::string &code) : Vertex(id){
-        this->code = code;
+    Station(int id, std::string &code) : Vertex(id,code){
+        
     }
     char getType() override{ return 's';}
 
@@ -76,18 +112,14 @@ class Reservoir : public Vertex{
 private:
     std::string name;
     std::string municipality;
-    std::string code;
     int delivery;
 public:
-    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id){
+    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id,code){
         this->name = name;
         this->municipality = municipality;
-        this->code = code;
         this->delivery = delivery;
     }
     char getType() override{ return 'r';}
-
-
 };
 
 
@@ -96,14 +128,12 @@ class City : public Vertex{
 private:
     std::string name;
     int id;
-    std::string code;
     int demand;
     int population;
 public:
-    City(std::string &name, int id, std::string &code, int demand, int population) : Vertex(id){
+    City(std::string &name, int id, std::string &code, int demand, int population) : Vertex(id,code){
         this->name = name;
         this->id = id;
-        this->code = code;
         this->demand = demand;
         this->population = population;
     }
