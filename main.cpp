@@ -4,12 +4,14 @@
 
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
     Menu::print("hello");
     Menu::displayoptions();
+    //int option = Menu::chooseoption();
 
     Graph g;
-    g.addCity((std::string &) "Porto", 1, (std::string &) "C1", 10, 1000);
-    g.findCity("Porto");
+    std::string n = "Porto";
+    std::string c = "C1";
+    g.addCity(n, 1, c, 10, 1000);
+    std::cout << '\n' << g.findCity("Porto")->getType();
     return 0;
 }

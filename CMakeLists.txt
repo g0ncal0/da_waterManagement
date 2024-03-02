@@ -6,6 +6,5 @@ set(CMAKE_CXX_STANDARD 11)
 add_executable(project main.cpp
         parser.cpp
         parser.h
-        Menu.cpp
         Menu.h
         graph/Graph.h)

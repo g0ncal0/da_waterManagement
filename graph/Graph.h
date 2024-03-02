@@ -136,7 +136,6 @@ public:
         this->capacity = capacity;
     }
 
-    Vertex * getDest() const{return dest;}
     double getCapacity() const{return capacity;}
     bool isSelected() const{return selected;}
     Vertex * getOrig() const{return orig;}
