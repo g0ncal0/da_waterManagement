@@ -16,85 +16,119 @@ class Graph{
 protected:
     std::vector<Vertex*> vertexSet;    // vertex set
 
-
 public:
     Vertex *findCity(const std::string &name) const;
     Vertex *findCity(const int &id) const;
     Vertex *findReservoir(const int &id) const;
+    bool addCity(std::string &name, int id, std::string &code, int demand, int population);
+    bool addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
+    bool addStation(int id, std::string &code);
+
+    bool removeVertex(Vertex* v){
+        auto it = std::find(vertexSet.begin(), vertexSet.end(), v);
+        if(it == vertexSet.end()){
+            return false;
+        }
+        vertexSet.erase(it);
+        return true;
+    }
+
+    std::vector<Vertex*> getVertexSet() const{return vertexSet;}
+
+
 };
 
 
 class Vertex{
-public:
-
-
 protected:
     std::vector<Edge *> adj;
-
-    // auxiliary fields
+    int id;
     bool visited = false;
     bool processing = false;
     double dist = 0;
     Edge *path = nullptr;
+    std::vector<Edge *> incoming;
 
-    std::vector<Edge *> incoming; // incoming edges
+
+public:
+    std::vector<Edge*> getAdj(){return adj;}
+    Vertex(int id){this->id = id;}
+    int getId() const{return id;};
+    virtual char getType(){return 'l';};
+
 
 };
 
 class Station : public Vertex{
-    Station(int id, std::string &code){
-        this->id = id;
-        this->code = code;
-    }
-
-protected:
+private:
     int id;
     std::string code;
+
+public:
+    Station(int id, std::string &code) : Vertex(id){
+        this->code = code;
+    }
+    char getType() override{ return 's';}
+
 };
 
 class Reservoir : public Vertex{
-public:
-    Reservoir(std::string &name, std::string &municipality, std::string &code, int delivery){
-        this->name = name;
-        this->municipality = municipality;
-        this->code = code;
-        this->delivery = delivery;
-    }
-
 private:
     std::string name;
     std::string municipality;
     std::string code;
     int delivery;
+public:
+    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id){
+        this->name = name;
+        this->municipality = municipality;
+        this->code = code;
+        this->delivery = delivery;
+    }
+    char getType() override{ return 'r';}
 
 
 };
 
 
 class City : public Vertex{
+
+private:
+    std::string name;
+    int id;
+    std::string code;
+    int demand;
+    int population;
 public:
-    City(std::string &name, int id, std::string &code, int demand, int population){
+    City(std::string &name, int id, std::string &code, int demand, int population) : Vertex(id){
         this->name = name;
         this->id = id;
         this->code = code;
         this->demand = demand;
         this->population = population;
     }
+    char getType() override{ return 'c';}
+
     std::string getName(){return name;}
-    int getId(){return id;}
     int getDemand(){return demand;}
 
-protected:
-    std::string name;
-    int id;
-    std::string code;
-    int demand;
-    int population;
 };
 
 
 
 class Edge{
+protected:
+    Vertex * dest; // destination vertex
+    double capacity; // edge weight, can also be used for capacity
+
+    // auxiliary fields
+    bool selected = false;
+
+    // used for bidirectional edges
+    Vertex *orig;
+    Edge *reverse = nullptr;
+
+    double flow; // for flow-related problems
 public:
     Edge(Vertex *orig, Vertex *dest, double capacity){
         this->orig = orig;
@@ -113,18 +147,7 @@ public:
     void setReverse(Edge *reverse){this->reverse = reverse;}
     void setFlow(double flow){this->flow = flow;};
 
-protected:
-    Vertex * dest; // destination vertex
-    double capacity; // edge weight, can also be used for capacity
 
-    // auxiliary fields
-    bool selected = false;
-
-    // used for bidirectional edges
-    Vertex *orig;
-    Edge *reverse = nullptr;
-
-    double flow; // for flow-related problems
 };
 
 
@@ -161,7 +184,22 @@ Vertex* Graph::findCity(const int &id) const {
 }
 
 
+bool Graph::addCity(std::string &name, int id, std::string &code, int demand, int population){
+    City* city = new City(name,id,code,demand, population);
+    vertexSet.push_back(city);
+    return true;
+}
 
+bool Graph::addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery){
+    Reservoir* reservoir = new Reservoir(name, municipality,id, code,delivery);
+    vertexSet.push_back(reservoir);
+    return true;
+}
 
+bool Graph::addStation(int id, std::string &code){
+    Station* station = new Station(id, code);
+    vertexSet.push_back(station);
+    return true;
+}
 
 #endif //WM_GRAPH_H
