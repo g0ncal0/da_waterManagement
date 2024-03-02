@@ -7,13 +7,13 @@
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 class Menu {
 private:
-    static std::vector<std::string> options;
-public:
-    Menu(){
-        options = {"Max Amount of Water by city", "Are needs met?", "Balance the load", "[RELIABILITY] One water reservoir is out", "[RELIABILITY] Which pumping stations are essential", "[RELIABILITY] Which pipelines are essential by city?", "[RELIABILITY] What cities are affected by mal-functioning of a pipeline."};
+    public:
+    static std::vector<std::string> getOptions(){
+        return {"Max Amount of Water by city", "Are needs met?", "Balance the load", "[RELIABILITY] One water reservoir is out", "[RELIABILITY] Which pumping stations are essential", "[RELIABILITY] Which pipelines are essential by city?", "[RELIABILITY] What cities are affected by mal-functioning of a pipeline."};
     }
     static void print(std::string t){
         std::cout << t << "\n";
@@ -25,7 +25,7 @@ public:
     }
     static void displayoptions(){
         print("Options:");
-        printList(options);
+        printList(getOptions());
     }
     static int getNumber() {
         int n = -1;
@@ -39,8 +39,8 @@ public:
         return n;
     }
     static int chooseoption(){
-        int choosen = options.size() + 1;
-        while(choosen >= options.size() || choosen < 0){
+        int choosen = getOptions().size() + 1;
+        while(choosen >= getOptions().size() || choosen < 0){
             choosen = getNumber();
         }
         return choosen;
