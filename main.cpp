@@ -9,7 +9,7 @@ int main() {
     Menu::displayoptions();
 
     Graph g;
-    Vertex a = new Vertex()
-    g.addVertex()
+    g.addCity((std::string &) "Porto", 1, (std::string &) "C1", 10, 1000);
+    g.findCity("Porto");
     return 0;
 }
