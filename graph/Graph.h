@@ -36,30 +36,9 @@ public:
         }
         return NULL;
     }
-    bool addEdge(const std::string& origin,const std::string& target, double capacity )
-    {
-        auto firstVertex=findVertex(origin);
-        auto secondVertex=findVertex(target);
-        if (secondVertex==NULL||firstVertex==NULL)
-        {
-            return 1;
-        }
-
-
-        
-
-    }
-    bool addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity){
-        auto firstVertex=findVertex(vertexA);
-        auto secondVertex=findVertex(vertexB);
-        if (secondVertex==NULL||firstVertex==NULL)
-        {
-            return 1;
-        }
-
-
-
-    }
+    bool addEdge(const std::string& origin,const std::string& target, double capacity );
+    //this can't be here because it need to call a function from the vertex which isn't defined yet...
+    bool addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity);
 
     bool removeVertex(Vertex* v){
         auto it = std::find(vertexSet.begin(), vertexSet.end(), v);
@@ -95,7 +74,16 @@ public:
     int getId() const{return id;};
     virtual char getType()=0;
     const std::string& getCode(){return code;}
-
+    bool addOutgoingEdge(Edge* edge)
+    {
+        adj.push_back(edge);
+        return 0;
+    }
+    bool addIncomingEdge(Edge* edge)
+    {
+        incoming.push_back(edge);
+        return 0;
+    }
 };
 
 class Station : public Vertex{
@@ -149,7 +137,7 @@ public:
 class Edge{
 protected:
     Vertex * dest; // destination vertex
-    double capacity; // edge weight, can also be used for capacity
+    double capacity=0; // edge weight, can also be used for capacity
 
     // auxiliary fields
     bool selected = false;
@@ -231,5 +219,41 @@ bool Graph::addStation(int id, std::string &code){
     vertexSet.push_back(station);
     return true;
 }
+
+
+    bool Graph::addEdge(const std::string& origin,const std::string& target, double capacity )
+    {
+        auto firstVertex=findVertex(origin);
+        auto secondVertex=findVertex(target);
+        if (secondVertex==NULL||firstVertex==NULL)
+        {
+            return 1;
+        }
+        auto edge= new Edge(firstVertex,secondVertex,capacity);
+        firstVertex->addOutgoingEdge(edge);
+        secondVertex->addIncomingEdge(edge);
+        
+return 0;
+    }
+    //this can't be here because it need to call a function from the vertex which isn't defined yet...
+    bool Graph::addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity){
+        auto firstVertex=findVertex(vertexA);
+        auto secondVertex=findVertex(vertexB);
+        if (secondVertex==NULL||firstVertex==NULL)
+        {
+            return 1;
+        }
+
+        auto edge1= new Edge(firstVertex,secondVertex,capacity);
+        auto edge2= new Edge(secondVertex,firstVertex,capacity);
+        edge1->setReverse(edge2);
+        edge2->setReverse(edge1); 
+        firstVertex->addOutgoingEdge(edge1);
+        secondVertex->addIncomingEdge(edge1);
+        firstVertex->addIncomingEdge(edge2);
+        secondVertex->addOutgoingEdge(edge2);
+return 0;
+    }
+
 
 #endif //WM_GRAPH_H
