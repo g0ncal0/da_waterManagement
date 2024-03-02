@@ -9,7 +9,5 @@ int main() {
     Menu::displayoptions();
 
     Graph g;
-    Vertex a = new Vertex()
-    g.addVertex()
     return 0;
 }
