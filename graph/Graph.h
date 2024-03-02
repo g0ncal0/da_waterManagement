@@ -20,9 +20,9 @@ public:
     Vertex *findCity(const std::string &name) const;
     Vertex *findCity(const int &id) const;
     Vertex *findReservoir(const int &id) const;
-    bool addCity(std::string &name, int id, std::string &code, int demand, int population);
-    bool addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
-    bool addStation(int id, std::string &code);
+    Vertex* addCity(std::string &name, int id, std::string &code, int demand, int population);
+    Vertex* addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
+    Vertex* addStation(int id, std::string &code);
 
     bool removeVertex(Vertex* v){
         auto it = std::find(vertexSet.begin(), vertexSet.end(), v);
@@ -183,22 +183,22 @@ Vertex* Graph::findCity(const int &id) const {
 }
 
 
-bool Graph::addCity(std::string &name, int id, std::string &code, int demand, int population){
+Vertex* Graph::addCity(std::string &name, int id, std::string &code, int demand, int population){
     City* city = new City(name,id,code,demand, population);
     vertexSet.push_back(city);
-    return true;
+    return city;
 }
 
-bool Graph::addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery){
+Vertex* Graph::addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery){
     Reservoir* reservoir = new Reservoir(name, municipality,id, code,delivery);
     vertexSet.push_back(reservoir);
-    return true;
+    return reservoir;
 }
 
-bool Graph::addStation(int id, std::string &code){
+Vertex* Graph::addStation(int id, std::string &code){
     Station* station = new Station(id, code);
     vertexSet.push_back(station);
-    return true;
+    return station;
 }
 
 #endif //WM_GRAPH_H
