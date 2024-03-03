@@ -24,6 +24,22 @@ public:
     Vertex* addReservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
     Vertex* addStation(int id, std::string &code);
 
+    Vertex* findVertex(const std::string& code)
+    {
+        for (size_t i = 0; i <vertexSet.size(); i++)
+        {
+            if (vertexSet[i]->getCode() == code)
+            {
+                return vertexSet[i];
+            }
+            
+        }
+        return NULL;
+    }
+    bool addEdge(const std::string& origin,const std::string& target, double capacity );
+    //this can't be here because it need to call a function from the vertex which isn't defined yet...
+    bool addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity);
+
     bool removeVertex(Vertex* v){
         auto it = std::find(vertexSet.begin(), vertexSet.end(), v);
         if(it == vertexSet.end()){
@@ -48,25 +64,33 @@ protected:
     double dist = 0;
     Edge *path = nullptr;
     std::vector<Edge *> incoming;
-
-
-public:
-    std::vector<Edge*> getAdj(){return adj;}
-    Vertex(int id){this->id = id;}
-    int getId() const{return id;};
-    virtual char getType(){return 'l';};
-
-
-};
-
-class Station : public Vertex{
-private:
-    int id;
     std::string code;
 
 public:
-    Station(int id, std::string &code) : Vertex(id){
-        this->code = code;
+    std::vector<Edge*> getAdj(){return adj;}
+    Vertex(int id,const std::string& code){this->id = id;
+    this->code = code;
+    }
+    int getId() const{return id;};
+    virtual char getType()=0;
+    const std::string& getCode(){return code;}
+    bool addOutgoingEdge(Edge* edge)
+    {
+        adj.push_back(edge);
+        return 0;
+    }
+    bool addIncomingEdge(Edge* edge)
+    {
+        incoming.push_back(edge);
+        return 0;
+    }
+};
+
+class Station : public Vertex{
+
+public:
+    Station(int id, std::string &code) : Vertex(id,code){
+        
     }
     char getType() override{ return 's';}
 
@@ -76,18 +100,14 @@ class Reservoir : public Vertex{
 private:
     std::string name;
     std::string municipality;
-    std::string code;
     int delivery;
 public:
-    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id){
+    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id,code){
         this->name = name;
         this->municipality = municipality;
-        this->code = code;
         this->delivery = delivery;
     }
     char getType() override{ return 'r';}
-
-
 };
 
 
@@ -96,14 +116,12 @@ class City : public Vertex{
 private:
     std::string name;
     int id;
-    std::string code;
     int demand;
     int population;
 public:
-    City(std::string &name, int id, std::string &code, int demand, int population) : Vertex(id){
+    City(std::string &name, int id, std::string &code, int demand, int population) : Vertex(id,code){
         this->name = name;
         this->id = id;
-        this->code = code;
         this->demand = demand;
         this->population = population;
     }
@@ -119,7 +137,7 @@ public:
 class Edge{
 protected:
     Vertex * dest; // destination vertex
-    double capacity; // edge weight, can also be used for capacity
+    double capacity=0; // edge weight, can also be used for capacity
 
     // auxiliary fields
     bool selected = false;
@@ -200,5 +218,41 @@ Vertex* Graph::addStation(int id, std::string &code){
     vertexSet.push_back(station);
     return station;
 }
+
+
+    bool Graph::addEdge(const std::string& origin,const std::string& target, double capacity )
+    {
+        auto firstVertex=findVertex(origin);
+        auto secondVertex=findVertex(target);
+        if (secondVertex==NULL||firstVertex==NULL)
+        {
+            return 1;
+        }
+        auto edge= new Edge(firstVertex,secondVertex,capacity);
+        firstVertex->addOutgoingEdge(edge);
+        secondVertex->addIncomingEdge(edge);
+        
+return 0;
+    }
+    //this can't be here because it need to call a function from the vertex which isn't defined yet...
+    bool Graph::addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity){
+        auto firstVertex=findVertex(vertexA);
+        auto secondVertex=findVertex(vertexB);
+        if (secondVertex==NULL||firstVertex==NULL)
+        {
+            return 1;
+        }
+
+        auto edge1= new Edge(firstVertex,secondVertex,capacity);
+        auto edge2= new Edge(secondVertex,firstVertex,capacity);
+        edge1->setReverse(edge2);
+        edge2->setReverse(edge1); 
+        firstVertex->addOutgoingEdge(edge1);
+        secondVertex->addIncomingEdge(edge1);
+        firstVertex->addIncomingEdge(edge2);
+        secondVertex->addOutgoingEdge(edge2);
+return 0;
+    }
+
 
 #endif //WM_GRAPH_H
