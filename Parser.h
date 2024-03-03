@@ -8,8 +8,8 @@
 
 class Graph;
 class Parser {
-Graph* parse(const std::string& reservoirFile, const std::string& stationFile,
-const std::string& cityFile, const std::string& pipeFile);
+Graph* parse(const std::string& reservoirFilePath, const std::string& stationFilePath,
+const std::string& cityFilePath, const std::string& pipeFilePath);
 };
 
 
