@@ -5,4 +5,10 @@ data/
 *cmake
 *.vcxproj*
 *.sln
-CMakeCache.txt
+CMakeCache*
+CMakeFiles/
+Debug/
+project.dir/
+x64/
+.vs/
+
