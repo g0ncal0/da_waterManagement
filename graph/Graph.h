@@ -51,6 +51,9 @@ public:
     const std::string& getCode();
     bool addOutgoingEdge(Edge* edge);
     bool addIncomingEdge(Edge* edge);
+    bool removeEdgeTo(Vertex *d);
+
+    friend class Graph;
 };
 
 class Station : public Vertex{

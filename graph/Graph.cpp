@@ -3,8 +3,18 @@
 ///*******************///
 /* GRAPH */
 
+bool Vertex::removeEdgeTo(Vertex *d) {
+    // HINT: use an iterator to scan the "adj" vector and then erase the edge.
+    for (auto it = adj.begin(); it != adj.end(); it++) {
+        if ((*it)->getDest() == d) {
+            adj.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
 
-    Vertex* Graph::findVertex(const std::string& code)
+Vertex* Graph::findVertex(const std::string& code)
     {
         for (size_t i = 0; i <vertexSet.size(); i++)
         {
@@ -16,15 +26,26 @@
         }
         return NULL;
     }
- 
-    bool Graph::removeVertex(Vertex* v){
-        auto it = std::find(vertexSet.begin(), vertexSet.end(), v);
-        if(it == vertexSet.end()){
-            return false;
-        }
-        vertexSet.erase(it);
-        return true;
+
+bool Graph::removeVertex(Vertex* v) {
+    auto iterator = findVertex(v->getCode());
+    if(iterator == NULL){
+        return false;
     }
+
+    for (auto it = vertexSet.begin(); it != vertexSet.end(); it++) {
+        if ((*it) == v) {
+            (*it)->adj.clear();
+            it = vertexSet.erase(it);
+            it--;
+        }
+        else {
+            (*it)->removeEdgeTo(v);
+        }
+    }
+
+    return true;
+}
 
     std::vector<Vertex*> Graph::getVertexSet() const{return vertexSet;}
 
