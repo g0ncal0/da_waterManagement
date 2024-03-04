@@ -1,0 +1,3 @@
+D:/FACULDADE/DAProject1/watermanagement/CMakeFiles/project.dir
+D:/FACULDADE/DAProject1/watermanagement/CMakeFiles/ALL_BUILD.dir
+D:/FACULDADE/DAProject1/watermanagement/CMakeFiles/ZERO_CHECK.dir
