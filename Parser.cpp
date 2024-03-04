@@ -86,7 +86,6 @@ while (getline(reservoirFile,line))
 getline(stationFile,line); //The first line doesn't contain valid information
 while (getline(stationFile,line))
 {
-    cout << "Iteration\n";
     istringstream stationData(line);
 
 
@@ -107,8 +106,6 @@ while (getline(stationFile,line))
 }
 
 }
-
-cout << "Escaped!!!\n";
 
 {
 ifstream cityFile(cityFilePath);

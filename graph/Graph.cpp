@@ -159,10 +159,19 @@ return 0;
         this->demand = demand;
         this->population = population;
     }
+
+    /*City::City() : Vertex() {
+        this->name = "";
+        this->id = 0;
+        this->demand = 0;
+        this->population = 0;
+    }*/
+
     char City::getType() { return 'c';}
 
     std::string City::getName(){return name;}
     int City::getDemand(){return demand;}
+
 ///_____RESERVOIR_____
     Reservoir::Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id,code){
         this->name = name;
@@ -171,26 +180,71 @@ return 0;
     }
     char Reservoir::getType() { return 'r';}
 
-///___STATION
+    int Reservoir::getDelivery() {
+        return delivery;
+    }
 
-    Station::Station(int id, std::string &code) : Vertex(id,code){
-        
-    }
+    Station::Station(int id, std::string &code) : Vertex(id, code){}
     char Station::getType() { return 's';}
+
 ///___VERTEX____
-    std::vector<Edge*> Vertex::getAdj(){return adj;}
-    Vertex::Vertex(int id,const std::string& code){this->id = id;
+
+std::vector<Edge*> Vertex::getAdj(){return adj;}
+
+Vertex::Vertex(int id,const std::string& code){
+    this->id = id;
     this->code = code;
-    }
-    int Vertex::getId() const{return id;};
-    const std::string& Vertex::getCode(){return code;}
-    bool Vertex::addOutgoingEdge(Edge* edge)
-    {
-        adj.push_back(edge);
-        return 0;
-    }
-    bool Vertex::addIncomingEdge(Edge* edge)
-    {
-        incoming.push_back(edge);
-        return 0;
-    }
+}
+
+/*Vertex::Vertex() {
+    this->id = 0;
+    this->code = "";
+}*/
+
+int Vertex::getId() const{return id;}
+const std::string& Vertex::getCode(){return code;}
+bool Vertex::addOutgoingEdge(Edge* edge) {
+    adj.push_back(edge);
+    return true;
+}
+
+bool Vertex::addIncomingEdge(Edge* edge) {
+    incoming.push_back(edge);
+    return true;
+}
+
+bool Vertex::isVisited() const {
+    return this->visited;
+}
+
+bool Vertex::isProcessing() const {
+    return this->processing;
+}
+
+double Vertex::getDist() const {
+    return this->dist;
+}
+
+Edge *Vertex::getPath() const {
+    return this->path;
+}
+
+std::vector<Edge *> Vertex::getIncoming() const {
+    return this->incoming;
+}
+
+void Vertex::setVisited(bool visited) {
+    this->visited = visited;
+}
+
+void Vertex::setProcessing(bool processing) {
+    this->processing = processing;
+}
+
+void Vertex::setDist(double dist) {
+    this->dist = dist;
+}
+
+void Vertex::setPath(Edge *path) {
+    this->path = path;
+}

@@ -46,12 +46,23 @@ protected:
 public:
     std::vector<Edge*> getAdj();
     Vertex(int id,const std::string& code);
+    //Vertex();
     int getId() const;
     virtual char getType()=0;
     const std::string& getCode();
     bool addOutgoingEdge(Edge* edge);
     bool addIncomingEdge(Edge* edge);
     bool removeEdgeTo(Vertex *d);
+
+    bool isVisited() const;
+    bool isProcessing() const;
+    double getDist() const;
+    Edge *getPath() const;
+    std::vector<Edge *> getIncoming() const;
+    void setVisited(bool visited);
+    void setProcessing(bool processing);
+    void setDist(double dist);
+    void setPath(Edge *path);
 
     friend class Graph;
 };
@@ -72,6 +83,7 @@ private:
 public:
     Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
     char getType() override;
+    int getDelivery();
 };
 
 
@@ -84,6 +96,7 @@ private:
     int population;
 public:
     City(std::string &name, int id, std::string &code, int demand, int population);
+    //City();
     char getType() override;
 
     std::string getName();
