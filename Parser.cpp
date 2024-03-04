@@ -31,6 +31,10 @@ const std::string& cityFilePath, const std::string& pipeFilePath)
     helper.clear();
     };
 
+    auto getLong=[](istringstream& data, long& toSet){
+    data>>toSet;
+    data.ignore(1);
+    };
 
 Graph* graph= new Graph();
 
@@ -51,9 +55,9 @@ while (getline(reservoirFile,line))
 
     getUntilComma(reservoirData,name);
     getUntilComma(reservoirData,municipality);   
-    reservoirData>>id;
+    getLong(reservoirData,id);
     getUntilComma(reservoirData,code);
-    reservoirData>>maxDelivery;
+    getLong(reservoirData,maxDelivery);
     if (name!=""&&municipality!=""&&code!="")
     {
     graph->addReservoir(name,municipality,id,code,maxDelivery);
@@ -77,8 +81,7 @@ while (getline(stationFile,line))
     string code;
     long id;
 
-
-    stationData>>id;
+    getLong(stationData,id);
     getUntilComma(stationData,code);
     if (code!="")
     {
@@ -143,6 +146,7 @@ while (getline(pipeFile,line))
     getUntilComma(pipeData,codeOrigin);
     getUntilComma(pipeData,codeDestination);
     pipeData>>capacity;
+    getLong(pipeData,capacity);
     pipeData>>isBi;
 
 
