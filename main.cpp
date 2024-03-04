@@ -11,7 +11,7 @@ int main() {
     Parser p;
     Graph* graph=p.parse("data/Small/Reservoirs_Madeira.csv", 
         "data/Small/Stations_Madeira.csv", 
-        "data/Small/City_Madeira.csv",
+        "data/Small/Cities_Madeira.csv",
         "data/Small/Pipes_Madeira.csv");
 
     std::cout << "Hello, World!" << std::endl;

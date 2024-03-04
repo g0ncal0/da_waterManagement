@@ -35,6 +35,14 @@ const std::string& cityFilePath, const std::string& pipeFilePath)
             toSet = stoi(line);
         }
         };
+    auto getDouble = [](istringstream& data, double& toSet, char end = ',') {
+        std::string line;
+        getline(data, line, end);
+        if (line != "")
+        {
+            toSet = stod(line);
+        }
+        };
 
 Graph* graph= new Graph();
 
@@ -111,15 +119,27 @@ while (getline(cityFile,line))
 
 
     string name,code;
-    long id,population;
+    int id; long population = 0;
     double demand;
 
-    getUntilComma(cityData,code);
-    cityData>>id;
-    getUntilComma(cityData,code);
-    cityData>>demand;
-    cityData>>population;
+    getUntilComma(cityData,name,',');
+    getInt(cityData,id, ',');
+    getUntilComma(cityData,code, ',');
+    getDouble(cityData,demand);
+    cityData.ignore(1);
+    std::string helper,helper2;
+    getUntilComma(cityData, helper,'\"');
+    for (char c: helper) {
+        if (c!=',')
+        {
+            helper2 += c;
+        }
+    }
+    if (helper2!="")
+    {
+        population = stol(helper2);
 
+    }
 
     if (code!=""&&name!="")
     {
