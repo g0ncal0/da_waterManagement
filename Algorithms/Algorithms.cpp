@@ -25,6 +25,13 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
                     vertex = edge->getDest();
                 }
 
+                if (vertex->getType() == 'r') {
+                    auto* reservoir = dynamic_cast<Reservoir*>(vertex);
+                    if ((reservoir->getDelivery() - reservoir->getActualDelivery()) < minFlow) {
+                        minFlow = reservoir->getDelivery() - reservoir->getActualDelivery();
+                    }
+                }
+
                 edge = vertex->getPath();
             }
 
@@ -42,10 +49,20 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
                     vertex = edge->getDest();
                 }
 
+                if (vertex->getType() == 'r') {
+                    auto* reservoir = dynamic_cast<Reservoir*>(vertex);
+                    reservoir->setActualDelivery(reservoir->getActualDelivery() + minFlow);
+                }
+
                 edge = vertex->getPath();
             }
 
             return true;
+        }
+
+        if (v->getType() == 'r') {
+            auto* reservoir = dynamic_cast<Reservoir*>(v);
+            if (reservoir->getDelivery() == reservoir->getActualDelivery()) continue;
         }
 
         for (Edge* edge : v->getAdj()) {

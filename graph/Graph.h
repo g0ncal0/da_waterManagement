@@ -80,10 +80,13 @@ private:
     std::string name;
     std::string municipality;
     int delivery;
+    int actualDelivery = 0;
 public:
     Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
     char getType() override;
-    int getDelivery();
+    int getDelivery() const;
+    int getActualDelivery() const;
+    void setActualDelivery(int actualDelivery);
 };
 
 

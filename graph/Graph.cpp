@@ -180,8 +180,16 @@ return 0;
     }
     char Reservoir::getType() { return 'r';}
 
-    int Reservoir::getDelivery() {
+    int Reservoir::getDelivery() const {
         return delivery;
+    }
+
+    int Reservoir::getActualDelivery() const {
+        return actualDelivery;
+    }
+
+    void Reservoir::setActualDelivery(int actualDelivery) {
+        this->actualDelivery = actualDelivery;
     }
 
     Station::Station(int id, std::string &code) : Vertex(id, code){}
