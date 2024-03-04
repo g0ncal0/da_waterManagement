@@ -8,6 +8,7 @@
 
 class Graph;
 class Parser {
+public:
 Graph* parse(const std::string& reservoirFilePath, const std::string& stationFilePath,
 const std::string& cityFilePath, const std::string& pipeFilePath);
 };

@@ -2,11 +2,19 @@
 #include "Menu.h"
 #include "graph/Graph.h"
 using namespace std;
-
+#include "Parser.h"
 int main() {
+  //  Menu::print("hello");
+  //  Menu::displayoptions();
+
+
+    Parser p;
+    Graph* graph=p.parse("data/Small/Reservoirs_Madeira.csv", 
+        "data/Small/Stations_Madeira.csv", 
+        "data/Small/City_Madeira.csv",
+        "data/Small/Pipes_Madeira.csv");
+
     std::cout << "Hello, World!" << std::endl;
-    Menu::print("hello");
-    Menu::displayoptions();
 
     Graph g;
     string city = "Porto";

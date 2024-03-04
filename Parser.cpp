@@ -13,28 +13,28 @@ Graph* Parser::parse(const std::string& reservoirFilePath, const std::string& st
 const std::string& cityFilePath, const std::string& pipeFilePath)
 {
 
-    auto getUntilComma=[]( istringstream& data, std::string& toSet){
+    auto getUntilComma=[]( istringstream& data, std::string& toSet,char end=',') {
     
-    ostringstream helper;
-    char c;
-    do
-    {
-    data >> c;
-    }while (c==',');
-    
-    while (c!=',')
-    {
-       helper << c; 
-    data >> c;
-    }
-    toSet = helper.str();
-    helper.clear();
+        getline(data, toSet, end);
     };
 
-    auto getLong=[](istringstream& data, long& toSet){
-    data>>toSet;
-    data.ignore(1);
+    auto getLong=[](istringstream& data, long& toSet, char end = ','){
+
+        std::string line;
+        getline(data, line, end);
+        if (line != "")
+        {
+            toSet = stol(line);
+        }
     };
+    auto getInt = [](istringstream& data, int& toSet, char end = ',') {
+        std::string line;
+        getline(data, line, end);
+        if (line!="")
+        {
+            toSet = stoi(line);
+        }
+        };
 
 Graph* graph= new Graph();
 
@@ -71,17 +71,21 @@ while (getline(reservoirFile,line))
 
 //initializing stations
 {
-ifstream stationFile(stationFilePath);
+
+   
+
+    ifstream stationFile(stationFilePath);
 getline(stationFile,line); //The first line doesn't contain valid information
 while (getline(stationFile,line))
 {
+    cout << "Iteration\n";
     istringstream stationData(line);
 
 
     string code;
-    long id;
+    int id;
 
-    getLong(stationData,id);
+    getInt(stationData,id);
     getUntilComma(stationData,code);
     if (code!="")
     {
@@ -93,9 +97,10 @@ while (getline(stationFile,line))
     }
     
 }
+
 }
 
-
+cout << "Escaped!!!\n";
 
 {
 ifstream cityFile(cityFilePath);
@@ -161,7 +166,7 @@ while (getline(pipeFile,line))
         }
         
     }
-    //else
+    else
     {
         cout<<"Unexpected line found in "<<pipeFilePath<<":"<<line<<"\n";
     }
@@ -173,5 +178,5 @@ while (getline(pipeFile,line))
 
 
 
-return 0;
+return graph;
 }
