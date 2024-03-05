@@ -10,14 +10,20 @@
 #include <queue>
 #include <climits>
 #include <iostream>
-using namespace std;
+
 
 class Algorithms {
 public:
-    static bool BFSEdmondsKarp(Graph* g, queue<Vertex*> q);
+    static bool BFSEdmondsKarp(Graph* g, std::queue<Vertex*> q);
     static void simpleEdmondsKarp(Graph *g);
 
-    static void citiesWithNotEnoughWater(Graph* g);
+    static std::vector<City*> citiesWithNotEnoughWater(Graph* g);
+
+    // Store on pair (Pipe, float) for each pipe the percentage of decrease/increase that it had after balance
+    static std::vector<std::pain<Edge*, float>> BalanceTheLoad(Graph* g);
+
+    static void
+
 };
 
 

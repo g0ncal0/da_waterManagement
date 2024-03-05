@@ -4,6 +4,8 @@
 
 #include "Algorithms.h"
 
+using namespace std;
+
 bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     while (!q.empty()) {
         Vertex* v = q.front();
@@ -112,11 +114,10 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
 
 
-
-void Algorithms::citiesWithNotEnoughWater(Graph* g) 
+vector<City*> Algorithms::citiesWithNotEnoughWater(Graph* g)
 {
     simpleEdmondsKarp(g);
-    
+    vector<City*>info;
     
     for (Vertex* vert:g->getVertexSet())
     {
@@ -124,8 +125,17 @@ void Algorithms::citiesWithNotEnoughWater(Graph* g)
         {
             City* city = (City*)vert;
 
+            double waterReceived = 0;
+
+            for (auto incomingEdge:city->getAdj())
+            {
+                waterReceived+=incomingEdge->getFlow();
+
+            }
+            city.setTotalWaterIn(waterReceived);
+            info.push_back(city);
         }
         
     }
-
+    return info;
 }
