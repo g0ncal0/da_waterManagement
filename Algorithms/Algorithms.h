@@ -16,6 +16,8 @@ class Algorithms {
 public:
     static bool BFSEdmondsKarp(Graph* g, queue<Vertex*> q);
     static void simpleEdmondsKarp(Graph *g);
+
+    static void citiesWithNotEnoughWater(Graph* g);
 };
 
 

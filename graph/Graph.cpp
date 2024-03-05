@@ -28,23 +28,22 @@ Vertex* Graph::findVertex(const std::string& code)
     }
 
 bool Graph::removeVertex(Vertex* v) {
-    auto iterator = findVertex(v->getCode());
-    if(iterator == NULL){
-        return false;
-    }
+    
 
     for (auto it = vertexSet.begin(); it != vertexSet.end(); it++) {
         if ((*it) == v) {
-            (*it)->adj.clear();
-            it = vertexSet.erase(it);
-            it--;
-        }
-        else {
-            (*it)->removeEdgeTo(v);
+            auto v = *it;
+            v->removeOutgoingEdges();
+            for (auto u : vertexSet) {
+                u->removeEdgeTo(v);
+            }
+            vertexSet.erase(it);
+            delete v;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
     std::vector<Vertex*> Graph::getVertexSet() const{return vertexSet;}
@@ -255,4 +254,13 @@ void Vertex::setDist(double dist) {
 
 void Vertex::setPath(Edge *path) {
     this->path = path;
+}
+
+void Vertex::removeOutgoingEdges() 
+{
+    for (Edge* edge:adj)
+    {
+        delete edge;
+    }
+    adj.resize(0);
 }
