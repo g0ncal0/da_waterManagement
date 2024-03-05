@@ -68,6 +68,7 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     return false;
 }
 
+
 void Algorithms::simpleEdmondsKarp(Graph *g) {
     string name = "SuperSource";
     string code = "Source";
@@ -107,4 +108,24 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
     g->removeVertex(source);
     g->removeVertex(sink);
+}
+
+
+
+
+void Algorithms::citiesWithNotEnoughWater(Graph* g) 
+{
+    simpleEdmondsKarp(g);
+    
+    
+    for (Vertex* vert:g->getVertexSet())
+    {
+        if (vert->getType()=='c')
+        {
+            City* city = (City*)vert;
+
+        }
+        
+    }
+
 }

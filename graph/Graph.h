@@ -44,6 +44,7 @@ protected:
     std::string code;
 
 public:
+    void removeOutgoingEdges();
     std::vector<Edge*> getAdj();
     Vertex(int id,const std::string& code);
     //Vertex();
