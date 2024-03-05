@@ -171,6 +171,12 @@ return 0;
 
     std::string City::getName(){return name;}
     int City::getDemand(){return demand;}
+    int City::getTotalWaterIn() const {
+        return totalWaterIn;
+    }
+    void City::setTotalWaterIn(int totalWaterIn) {
+        this->totalWaterIn = totalWaterIn;
+    }
 
 ///_____RESERVOIR_____
     Reservoir::Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id,code){
