@@ -25,13 +25,6 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
                     vertex = edge->getDest();
                 }
 
-                if (vertex->getType() == 'r') {
-                    auto* reservoir = dynamic_cast<Reservoir*>(vertex);
-                    if ((reservoir->getDelivery() - reservoir->getActualDelivery()) < minFlow) {
-                        minFlow = reservoir->getDelivery() - reservoir->getActualDelivery();
-                    }
-                }
-
                 edge = vertex->getPath();
             }
 
@@ -49,20 +42,10 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
                     vertex = edge->getDest();
                 }
 
-                if (vertex->getType() == 'r') {
-                    auto* reservoir = dynamic_cast<Reservoir*>(vertex);
-                    reservoir->setActualDelivery(reservoir->getActualDelivery() + minFlow);
-                }
-
                 edge = vertex->getPath();
             }
 
             return true;
-        }
-
-        if (v->getType() == 'r') {
-            auto* reservoir = dynamic_cast<Reservoir*>(v);
-            if (reservoir->getDelivery() == reservoir->getActualDelivery()) continue;
         }
 
         for (Edge* edge : v->getAdj()) {
@@ -102,7 +85,10 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
         v->setVisited(false);
         for (Edge* edge : v->getAdj()) edge->setFlow(0);
 
-        if ((v->getType() == 'r') && (v->getCode() != "Source")) g->addEdge("Source", v->getCode(), INT_MAX);
+        if ((v->getType() == 'r') && (v->getCode() != "Source")) {
+            auto* reservoir = dynamic_cast<Reservoir*>(v);
+            g->addEdge("Source", v->getCode(), reservoir->getDelivery());
+        }
         else if ((v->getType() == 'c') && (v->getCode() != "Sink")) g->addEdge(v->getCode(), "Sink", INT_MAX);
 
         else if (v->getCode() == "Source") {
