@@ -176,10 +176,10 @@ while (getline(pipeFile,line))
     {
         if (isBi)
         {
-            graph->addBidirectionalEdge(codeOrigin,codeDestination,capacity);
+            graph->addEdge(codeOrigin,codeDestination,capacity);
         }else
         {
-         graph->addEdge(codeOrigin,codeDestination,capacity);    
+         graph->addBidirectionalEdge(codeOrigin,codeDestination,capacity);
         }
         
     }
