@@ -114,7 +114,7 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
 
 
-vector<City*> Algorithms::citiesWithNotEnoughWater(Graph* g)
+vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* g)
 {
     simpleEdmondsKarp(g);
     vector<City*>info;
