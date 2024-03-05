@@ -98,6 +98,7 @@ private:
     int id;
     int demand;
     int population;
+    int totalWaterIn;
 public:
     City(std::string &name, int id, std::string &code, int demand, int population);
     //City();
@@ -105,7 +106,8 @@ public:
 
     std::string getName();
     int getDemand();
-
+    int getTotalWaterIn() const;
+    void setTotalWaterIn(int totalWaterIn);
 };
 
 
