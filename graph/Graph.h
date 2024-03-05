@@ -46,7 +46,8 @@ protected:
     std::vector<Edge *> incoming;
     std::string code;
 
-public
+public:
+    //todo: this isn't supposed to copy edges, just the rest.
     virtual Vertex* clone()=0;
     void removeOutgoingEdges();
     std::vector<Edge*> getAdj();
