@@ -17,6 +17,9 @@ protected:
     std::vector<Vertex*> vertexSet;    // vertex set
 
 public:
+    Graph* clone() const;
+    bool addVertex(Vertex* vert) ;
+
     Vertex *findCity(const std::string &name) const;
     Vertex *findCity(const int &id) const;
     Vertex *findReservoir(const int &id) const;
@@ -43,7 +46,8 @@ protected:
     std::vector<Edge *> incoming;
     std::string code;
 
-public:
+public
+    virtual Vertex* clone()=0;
     void removeOutgoingEdges();
     std::vector<Edge*> getAdj();
     Vertex(int id,const std::string& code);

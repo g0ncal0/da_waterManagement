@@ -116,7 +116,7 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
 vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* g)
 {
-    simpleEdmondsKarp(g);
+    //simpleEdmondsKarp(g);
     vector<City*>info;
     
     for (Vertex* vert:g->getVertexSet())
@@ -132,10 +132,18 @@ vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* g)
                 waterReceived+=incomingEdge->getFlow();
 
             }
-            city.setTotalWaterIn(waterReceived);
+            city->setTotalWaterIn(waterReceived);
             info.push_back(city);
         }
         
     }
     return info;
+}
+
+std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, std::string reservoirCode)
+{
+
+
+
+
 }

@@ -3,15 +3,32 @@
 ///*******************///
 /* GRAPH */
 
-bool Vertex::removeEdgeTo(Vertex *d) {
-    // HINT: use an iterator to scan the "adj" vector and then erase the edge.
-    for (auto it = adj.begin(); it != adj.end(); it++) {
-        if ((*it)->getDest() == d) {
-            adj.erase(it);
-            return true;
-        }
+Graph* Graph::clone() const
+{
+    Graph* graph= new Graph();
+
+    for (Vertex* vert:getVertexSet())
+    {
+        graph->addVertex(vert->clone());
     }
-    return false;
+    for (Vertex* vert:getVertexSet()) {
+        for(Edge* edge: vert->getAdj())
+        {
+            graph->addEdge(edge);
+        }
+
+    }
+
+    //TODO: this doesn't process bidirectional edges yet
+    return graph;
+}
+bool Graph::addVertex(Vertex* vert) {
+    if(findVertex(vert->getCode()))
+    {
+        return false;
+    }
+    vertexSet.push_back(vert);
+    return true;
 }
 
 Vertex* Graph::findVertex(const std::string& code)
@@ -269,4 +286,15 @@ void Vertex::removeOutgoingEdges()
         delete edge;
     }
     adj.resize(0);
+}
+
+bool Vertex::removeEdgeTo(Vertex *d) {
+    // HINT: use an iterator to scan the "adj" vector and then erase the edge.
+    for (auto it = adj.begin(); it != adj.end(); it++) {
+        if ((*it)->getDest() == d) {
+            adj.erase(it);
+            return true;
+        }
+    }
+    return false;
 }
