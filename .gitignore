@@ -2,3 +2,13 @@ cmake-build-debug
 .idea/
 data/
 .vscode/
+*cmake
+*.vcxproj*
+*.sln
+CMakeCache*
+CMakeFiles/
+Debug/
+project.dir/
+x64/
+.vs/
+

@@ -1,10 +1,12 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.26)
 project(project)
 
 set(CMAKE_CXX_STANDARD 11)
 
 add_executable(project main.cpp
-        parser.cpp
-        parser.h
+        Parser.cpp
+        Parser.h
+        Menu.cpp
         Menu.h
-        graph/Graph.h)
+        graph/Graph.h
+        graph/Graph.cpp)

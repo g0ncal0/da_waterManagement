@@ -1,9 +1,12 @@
 #include <iostream>
 #include "Menu.h"
 #include "graph/Graph.h"
-
+#include "Parser.h"
+using namespace std;
 
 int main() {
+    Parser* p = new Parser();
+    p->parse("../data/Reservoirs_Madeira.csv", "./data/Stations_Madeira.csv", "./data/Cities_Madeira.csv", "./data/Pipes_Madeira.csv");
     Menu::print("hello");
     Menu::displayoptions();
     //int option = Menu::chooseoption();
@@ -16,5 +19,6 @@ int main() {
     std::cout << newcity->getType();
 
     std::cout << '\n' << g.findCity("Porto")->getType();
+
     return 0;
 }
