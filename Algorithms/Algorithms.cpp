@@ -145,5 +145,38 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, std::s
     std::vector<CityWaterLoss> wl;
 
 
-return wl;
+
+    //temporary algorithm, that must run edmonds-karp every time
+    Graph* copy= graph->clone();
+
+    copy->removeVertex(copy->findVertex(reservoirCode));
+
+    simpleEdmondsKarp(copy);
+
+
+    for (Vertex* vert:copy->getVertexSet())
+    {
+        if (vert->getType()=='c')
+        {
+            City* city = (City*)vert;
+
+            double waterReceived = 0;
+
+            for (auto incomingEdge:city->getAdj())
+            {
+                waterReceived+=incomingEdge->getFlow();
+
+            }
+            city->setTotalWaterIn(waterReceived);
+
+            City *originalCity=(City*)graph->findVertex(city->getCode());
+
+            wl.push_back({city->getCode(),city->getTotalWaterIn()-originalCity->getTotalWaterIn()});
+        }
+
+    }
+
+    delete copy;
+
+    return wl;
 }

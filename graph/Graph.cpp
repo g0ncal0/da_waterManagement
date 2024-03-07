@@ -224,10 +224,10 @@ return new City(name,id,code,demand,population);
 
     std::string City::getName(){return name;}
     int City::getDemand(){return demand;}
-    int City::getTotalWaterIn() const {
+    double City::getTotalWaterIn() const {
         return totalWaterIn;
     }
-    void City::setTotalWaterIn(int totalWaterIn) {
+    void City::setTotalWaterIn(double totalWaterIn) {
         this->totalWaterIn = totalWaterIn;
     }
 

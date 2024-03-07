@@ -104,7 +104,7 @@ private:
     int id;
     int demand;
     int population;
-    int totalWaterIn;
+    double totalWaterIn;
 public:
     City(const std::string &name, int id, const std::string &code, int demand, int population);
     //City();
@@ -112,8 +112,8 @@ public:
 
     std::string getName();
     int getDemand();
-    int getTotalWaterIn() const;
-    void setTotalWaterIn(int totalWaterIn);
+    double getTotalWaterIn() const;
+    void setTotalWaterIn(double totalWaterIn);
     virtual Vertex* clone()const override;
 };
 
