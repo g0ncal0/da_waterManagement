@@ -40,7 +40,9 @@ public:
 
     //4
     //returns affected cities
-    static std::vector<CityWaterLoss> CanShutDownReservoir(Graph* graph, std::string reservoirCode);
+    static std::vector<CityWaterLoss> CanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
+    static bool DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss);
+    static std::vector<CityWaterLoss> smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
     // static std::vector<CityWaterLoss> CanShutDownReservoirs(Graph* graph, std::vector<std::string> reservoirCode);
 
     //5)
