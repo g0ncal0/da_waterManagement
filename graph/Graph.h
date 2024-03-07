@@ -48,7 +48,7 @@ protected:
 
 public:
     //todo: this isn't supposed to copy edges or anything with pointers, just the rest.
-    virtual Vertex* clone()=0;
+    virtual Vertex* clone()const =0;
     void removeOutgoingEdges();
     std::vector<Edge*> getAdj();
     Vertex(int id,const std::string& code);
@@ -76,9 +76,9 @@ public:
 class Station : public Vertex{
 
 public:
-    Station(int id, std::string &code);
+    Station(int id, const std::string &code);
     char getType() override;
-
+    virtual Vertex* clone()const override;
 };
 
 class Reservoir : public Vertex{
@@ -88,11 +88,12 @@ private:
     int delivery;
     int actualDelivery = 0;
 public:
-    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
+    Reservoir(const std::string &name, const std::string &municipality, int id, const std::string &code, int delivery);
     char getType() override;
     int getDelivery() const;
     int getActualDelivery() const;
     void setActualDelivery(int actualDelivery);
+    virtual Vertex* clone()const override;
 };
 
 
@@ -105,7 +106,7 @@ private:
     int population;
     int totalWaterIn;
 public:
-    City(std::string &name, int id, std::string &code, int demand, int population);
+    City(const std::string &name, int id, const std::string &code, int demand, int population);
     //City();
     char getType() override;
 
@@ -113,6 +114,7 @@ public:
     int getDemand();
     int getTotalWaterIn() const;
     void setTotalWaterIn(int totalWaterIn);
+    virtual Vertex* clone()const override;
 };
 
 

@@ -14,12 +14,45 @@ Graph* Graph::clone() const
     for (Vertex* vert:getVertexSet()) {
         for(Edge* edge: vert->getAdj())
         {
-            graph->addEdge(edge);
+            graph->addEdge(edge->getOrig()->getCode(),edge->getDest()->getCode(),edge->getCapacity());
         }
 
     }
+//this assumes that there aren't any two edges with the same destination and the same origin.
+    for (Vertex* vert:getVertexSet()) {
+        for(Edge* edge: vert->getAdj())
+        {
+            if(edge->getReverse()!= nullptr)
+            {
+                Vertex* orig= graph->findVertex(edge->getOrig()->getCode());
+                Vertex* dest= graph->findVertex(edge->getDest()->getCode());
+                Edge* e1= nullptr;
+                for (Edge* e:orig->getAdj())
+                {
+                    if(e->getDest()==dest)
+                    {
+                        e1=e;
+                        break;
+                    }
+                }
+                if(e1== nullptr){continue;}
+                if(e1->getReverse()!=0)
+                {
+                    continue;
+                }
+                for (Edge* e:dest->getAdj())
+                {
+                    if(e->getDest()==orig)
+                    {
+                        e1->setReverse(e);
+                        e->setReverse(e1);
+                        break;
+                    }
+                }
 
-    //TODO: this doesn't process bidirectional edges yet
+            }
+        }
+    }
     return graph;
 }
 bool Graph::addVertex(Vertex* vert) {
@@ -168,8 +201,12 @@ return 0;
     void Edge::setReverse(Edge *reverse){this->reverse = reverse;}
     void Edge::setFlow(double flow){this->flow = flow;};
 ///____CITY_____
+        Vertex* City::clone() const
+        {
+return new City(name,id,code,demand,population);
 
-    City::City(std::string &name, int id, std::string &code, int demand, int population) : Vertex(id,code){
+        }
+    City::City(const std::string &name, int id, const std::string &code, int demand, int population) : Vertex(id,code){
         this->name = name;
         this->id = id;
         this->demand = demand;
@@ -195,7 +232,11 @@ return 0;
     }
 
 ///_____RESERVOIR_____
-    Reservoir::Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery) : Vertex(id,code){
+Vertex* Reservoir::clone() const{
+        return new Reservoir(name,municipality,id,code,delivery);
+
+    }
+    Reservoir::Reservoir(const std::string &name, const std::string &municipality, int id, const std::string &code, int delivery) : Vertex(id,code){
         this->name = name;
         this->municipality = municipality;
         this->delivery = delivery;
@@ -213,8 +254,13 @@ return 0;
     void Reservoir::setActualDelivery(int actualDelivery) {
         this->actualDelivery = actualDelivery;
     }
+///___Station___
+    Vertex* Station::clone() const
+    {
+        return new Station(id,code);
+    }
 
-    Station::Station(int id, std::string &code) : Vertex(id, code){}
+    Station::Station(int id, const std::string &code) : Vertex(id, code){}
     char Station::getType() { return 's';}
 
 ///___VERTEX____

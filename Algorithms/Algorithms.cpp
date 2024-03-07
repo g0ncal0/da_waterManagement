@@ -142,8 +142,8 @@ vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* g)
 
 std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, std::string reservoirCode)
 {
+    std::vector<CityWaterLoss> wl;
 
 
-
-
+return wl;
 }
