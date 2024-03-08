@@ -114,34 +114,8 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
 
 
-vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* g)
-{
-    //simpleEdmondsKarp(g);
-    vector<City*>info;
-    
-    for (Vertex* vert:g->getVertexSet())
-    {
-        if (vert->getType()=='c')
-        {
-            City* city = (City*)vert;
-
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getAdj())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
-            info.push_back(city);
-        }
-        
-    }
-    return info;
-}
-
 //assumes that the graph has already been pre-prepared with the results of the edmonds-karp algorithm.
-std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, std::string reservoirCode)
+std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, const std::string& reservoirCode)
 {
     std::vector<CityWaterLoss> wl;
 
@@ -180,4 +154,55 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, std::s
     delete copy;
 
     return wl;
+}
+
+bool Algorithms::DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss) {
+
+    if (!vertex->getIncoming().empty()) return false; //isto é demasiado restritivo acho que dá para melhorar
+
+    for (Edge* edge : vertex->getAdj()) {
+        if (edge->getDest()->getType() == 'c') {
+            // ESTAS LINHAS ERA PORQUE ESTAVA A PENSAR DE MANEIRA DIFERENTE DO QUE A GABRIELA FEZ, QUANDO ISTO FICAR FEITO EU APAGO
+
+            /*auto* city = dynamic_cast<City*>(edge->getDest());
+            int newMax = 0;
+
+            for (Edge* cityEdge : city->getIncoming()) {
+                if (cityEdge != edge) newMax += cityEdge->getCapacity();
+            }
+
+            if (newMax < city->getDemand()) {
+
+            }*/
+
+            for (CityWaterLoss& waterLoss : cityWaterLoss) {
+                if (waterLoss.cityCode == edge->getDest()->getCode()) {
+                    waterLoss.waterLoss += edge->getFlow();
+                    return true;
+                }
+            }
+
+            cityWaterLoss.push_back({edge->getDest()->getCode(), edge->getFlow()});
+        }
+
+        if (!DFSShutDownReservoir(edge->getDest(), cityWaterLoss)) return false;
+    }
+
+    return true;
+}
+
+std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode) {
+    Vertex* vertexReservoir;
+
+    for (Vertex* vertex : graph->getVertexSet()) {
+        if (vertex->getCode() == reservoirCode) {
+            vertexReservoir = vertex;
+            break;
+        }
+    }
+
+    std::vector<CityWaterLoss> cityWaterLoss;
+    if (DFSShutDownReservoir(vertexReservoir, cityWaterLoss)) return cityWaterLoss;
+
+    else return CanShutDownReservoir(graph, vertexReservoir->getCode());
 }
