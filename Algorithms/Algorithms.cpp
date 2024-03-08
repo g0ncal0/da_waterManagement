@@ -140,6 +140,7 @@ vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* g)
     return info;
 }
 
+//assumes that the graph has already been pre-prepared with the results of the edmonds-karp algorithm.
 std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, std::string reservoirCode)
 {
     std::vector<CityWaterLoss> wl;
