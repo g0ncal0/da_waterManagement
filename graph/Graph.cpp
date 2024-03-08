@@ -3,6 +3,18 @@
 ///*******************///
 /* GRAPH */
 
+//assumes graph is simple (no two edges A->B)
+bool Graph::removeEdge(const std::string& origin,const std::string& target){
+    Vertex* v= findVertex(origin);
+    Vertex* t= findVertex(target);
+    if(v== nullptr||t== nullptr){
+        return false;}
+
+    bool res1 =v->deleteEdgeTo(t);
+    bool res2 =t->deleteEdgeTo(v);
+    return res1&&res2;
+}
+
 Graph* Graph::clone() const
 {
     Graph* graph= new Graph();
@@ -338,6 +350,18 @@ bool Vertex::removeEdgeTo(Vertex *d) {
     // HINT: use an iterator to scan the "adj" vector and then erase the edge.
     for (auto it = adj.begin(); it != adj.end(); it++) {
         if ((*it)->getDest() == d) {
+            adj.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Vertex::deleteEdgeTo(Vertex *d)
+{
+    for (auto it = adj.begin(); it != adj.end(); it++) {
+        if ((*it)->getDest() == d) {
+            delete(*it);
             adj.erase(it);
             return true;
         }

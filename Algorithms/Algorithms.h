@@ -43,13 +43,15 @@ public:
     static std::vector<CityWaterLoss> CanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
     static bool DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss);
     static std::vector<CityWaterLoss> smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
-    // static std::vector<CityWaterLoss> CanShutDownReservoirs(Graph* graph, std::vector<std::string> reservoirCode);
+    static std::vector<CityWaterLoss> CanShutDownReservoirs(Graph* graph, const std::vector<std::string>& reservoirCode);
 
     //5)
-    //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph*);
+    //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph* graph);
+    static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph);
 
      //6)
     //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);
+    static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
 
 };
 

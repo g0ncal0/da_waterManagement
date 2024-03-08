@@ -16,9 +16,9 @@ class Graph{
 protected:
     std::vector<Vertex*> vertexSet;    // vertex set
 
+    bool addVertex(Vertex* vert);
 public:
     Graph* clone() const;
-    bool addVertex(Vertex* vert) ;
 
     Vertex *findCity(const std::string &name) const;
     Vertex *findCity(const int &id) const;
@@ -31,6 +31,9 @@ public:
     bool addEdge(const std::string& origin,const std::string& target, double capacity );
     bool addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity);
     bool removeVertex(Vertex* v);
+
+    bool removeEdge(const std::string& origin,const std::string& target);
+
     std::vector<Vertex*> getVertexSet() const;
 };
 
@@ -59,6 +62,7 @@ public:
     bool addOutgoingEdge(Edge* edge);
     bool addIncomingEdge(Edge* edge);
     bool removeEdgeTo(Vertex *d);
+    bool deleteEdgeTo(Vertex *d);
 
     bool isVisited() const;
     bool isProcessing() const;
