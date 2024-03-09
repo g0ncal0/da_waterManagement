@@ -14,6 +14,10 @@ int main() {
                          "../data/Small/Stations_Madeira.csv",
                          "../data/Small/Cities_Madeira.csv",
                          "../data/Small/Pipes_Madeira.csv");
+
+    Algorithms::simpleEdmondsKarp(graph);
+    Algorithms::CanShutDownReservoir(graph, "R_4");
+    /*
     Menu::displayoptions();
     int c = true;
     while(c){
@@ -41,6 +45,6 @@ int main() {
         for (Edge* edge : v->getAdj()) {
             cout << "   " << edge->getDest()->getCode() << "    " << edge->getCapacity() << "   " << edge->getFlow() << endl;
         }
-    }
+    }*/
     return 0;
 }

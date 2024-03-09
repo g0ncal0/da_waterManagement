@@ -10,7 +10,6 @@
 #include <vector>
 
 class Menu {
-private:
     public:
     static std::vector<std::string> getOptions();
     static void print(std::string t);

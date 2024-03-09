@@ -11,3 +11,4 @@ project.dir/
 x64/
 .vs/
 *.DS_STORE
+Testing/*

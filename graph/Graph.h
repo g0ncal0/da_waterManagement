@@ -16,7 +16,10 @@ class Graph{
 protected:
     std::vector<Vertex*> vertexSet;    // vertex set
 
+    bool addVertex(Vertex* vert);
 public:
+    Graph* clone() const;
+
     Vertex *findCity(const std::string &name) const;
     Vertex *findCity(const int &id) const;
     Vertex *findReservoir(const int &id) const;
@@ -28,6 +31,9 @@ public:
     bool addEdge(const std::string& origin,const std::string& target, double capacity );
     bool addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity);
     bool removeVertex(Vertex* v);
+
+    bool removeEdge(const std::string& origin,const std::string& target);
+
     std::vector<Vertex*> getVertexSet() const;
 };
 
@@ -44,6 +50,9 @@ protected:
     std::string code;
 
 public:
+    //todo: this isn't supposed to copy edges or anything with pointers, just the rest.
+    virtual Vertex* clone()const =0;
+    void removeOutgoingEdges();
     std::vector<Edge*> getAdj();
     Vertex(int id,const std::string& code);
     //Vertex();
@@ -53,6 +62,7 @@ public:
     bool addOutgoingEdge(Edge* edge);
     bool addIncomingEdge(Edge* edge);
     bool removeEdgeTo(Vertex *d);
+    bool deleteEdgeTo(Vertex *d);
 
     bool isVisited() const;
     bool isProcessing() const;
@@ -70,9 +80,9 @@ public:
 class Station : public Vertex{
 
 public:
-    Station(int id, std::string &code);
+    Station(int id, const std::string &code);
     char getType() override;
-
+    virtual Vertex* clone()const override;
 };
 
 class Reservoir : public Vertex{
@@ -82,11 +92,12 @@ private:
     int delivery;
     int actualDelivery = 0;
 public:
-    Reservoir(std::string &name, std::string &municipality, int id, std::string &code, int delivery);
+    Reservoir(const std::string &name, const std::string &municipality, int id, const std::string &code, int delivery);
     char getType() override;
     int getDelivery() const;
     int getActualDelivery() const;
     void setActualDelivery(int actualDelivery);
+    virtual Vertex* clone()const override;
 };
 
 
@@ -97,14 +108,17 @@ private:
     int id;
     int demand;
     int population;
+    double totalWaterIn;
 public:
-    City(std::string &name, int id, std::string &code, int demand, int population);
+    City(const std::string &name, int id, const std::string &code, int demand, int population);
     //City();
     char getType() override;
 
     std::string getName();
     int getDemand();
-
+    double getTotalWaterIn() const;
+    void setTotalWaterIn(double totalWaterIn);
+    virtual Vertex* clone()const override;
 };
 
 
