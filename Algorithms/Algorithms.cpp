@@ -206,6 +206,38 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
 
 
 
+std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
+{
+    std::vector<City*> cities;
+
+
+
+    for (Vertex* vert:graph->getVertexSet())
+    {
+        if (vert->getType()=='c')
+        {
+            City* city = (City*)vert;
+
+            double waterReceived = 0;
+
+            for (auto incomingEdge:city->getIncoming())
+            {
+                waterReceived+=incomingEdge->getFlow();
+
+            }
+            city->setTotalWaterIn(waterReceived);
+
+
+            if(city->getTotalWaterIn()<city->getDemand())
+            {
+                cities.push_back(city);
+            }
+
+        }
+
+    }
+    return cities;
+}
 
 
 

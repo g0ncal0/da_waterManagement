@@ -16,7 +16,8 @@ int main() {
                          "../data/Small/Pipes_Madeira.csv");
 
     Algorithms::simpleEdmondsKarp(graph);
-    Algorithms::CanShutDownReservoir(graph, "R_4");
+    std::vector<City*> cities = Algorithms::CitiesWithNotEnoughWater(graph);
+    //Algorithms::CanShutDownReservoir(graph, "R_4");
     /*
     Menu::displayoptions();
     int c = true;
