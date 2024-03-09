@@ -187,7 +187,6 @@ while (getline(pipeFile,line))
     {
         cout<<"Unexpected line found in "<<pipeFilePath<<":"<<line<<"\n";
     }
-    
 }
 }
 

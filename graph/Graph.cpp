@@ -89,17 +89,18 @@ Vertex* Graph::findVertex(const std::string& code)
         return NULL;
     }
 
-bool Graph::removeVertex(Vertex* v) {
+bool Graph::removeVertex(Vertex* in) {
     
 
     for (auto it = vertexSet.begin(); it != vertexSet.end(); it++) {
-        if ((*it) == v) {
+        if ((*it) == in) {
             auto v = *it;
             v->removeOutgoingEdges();
             for (auto u : vertexSet) {
                 u->removeEdgeTo(v);
             }
             vertexSet.erase(it);
+            delete v;
             return true;
         }
     }

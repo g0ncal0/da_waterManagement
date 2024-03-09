@@ -50,7 +50,8 @@ protected:
     std::string code;
 
 public:
-    //todo: this isn't supposed to copy edges or anything with pointers, just the rest.
+    virtual ~Vertex(){return;};
+    // todo: this isn't supposed to copy edges or anything with pointers, just the rest.
     virtual Vertex* clone()const =0;
     void removeOutgoingEdges();
     std::vector<Edge*> getAdj();
