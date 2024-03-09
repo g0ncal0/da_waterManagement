@@ -15,37 +15,36 @@ int main() {
                          "../data/Small/Cities_Madeira.csv",
                          "../data/Small/Pipes_Madeira.csv");
 
-    Algorithms::simpleEdmondsKarp(graph);
-    std::vector<City*> cities = Algorithms::CitiesWithNotEnoughWater(graph);
-    //Algorithms::CanShutDownReservoir(graph, "R_4");
-    /*
+    Menu::print("Welcome to the Water Management Program.");
     Menu::displayoptions();
     int c = true;
     while(c){
         int i = Menu::chooseoption();
-        switch(i){
+        switch (i) {
             case 0:
-                Algorithms::simpleEdmondsKarp(graph);
+                c = false;
                 break;
             case 1:
+                Menu::displayoptions();
+                break;
+            case 2:
+                Algorithms::simpleEdmondsKarp(graph);
+                Menu::printInfoCities(graph, Menu::getInput("Select your city or write NULL to select everything."));
+                break;
+            case 3:
+                Menu::print("This will only work if you have run option 2");
+                Menu::printCities(Algorithms::CitiesWithNotEnoughWater(graph), "These are the cities with not enough water");
+                break;
+            case 4:
+                Algorithms::BalanceTheLoad(graph);
+                break;
+            default:
                 c = false;
                 break;
         }
     }
 
-    cout << graph->getVertexSet().size() << endl;
+    Menu::print("Thanks for using our program. This was developed by Filipe Correia, Gabriela Silva e Gonçalo Nunes.");
 
-    for (Vertex* v : graph->getVertexSet()) {
-        cout << v->getCode();
-        if (v->getType() == 'r') {
-            Reservoir* r = dynamic_cast<Reservoir*>(v);
-            cout << "   " << r->getDelivery();
-        }
-        cout << endl;
-
-        for (Edge* edge : v->getAdj()) {
-            cout << "   " << edge->getDest()->getCode() << "    " << edge->getCapacity() << "   " << edge->getFlow() << endl;
-        }
-    }*/
     return 0;
 }

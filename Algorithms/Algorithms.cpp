@@ -204,6 +204,65 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
 
 
 
+GlobalStatisticsEdges calculatestatistics(Graph* g){
+    int sum = 0;
+    int howmany = 0;
+
+    int sumforvariance = 0;
+
+    int maxdifference = 0;
+    // Calculate avg (with sum of differences) and maxdifference
+    for(Vertex* vertex : g->getVertexSet()){
+        for(Edge* edge : vertex->getAdj()){
+            int difference = edge->getCapacity() - edge->getFlow();
+            sum += difference;
+            sumforvariance += difference * difference;
+            howmany++;
+            if(difference > maxdifference){
+                maxdifference = difference;
+            }
+        }
+    }
+    GlobalStatisticsEdges res;
+
+    res.avg = (float) sum / (float) howmany;
+    res.variance = ((float) sumforvariance - (float) howmany * res.avg) / (float) (howmany - 1); // FORMULA TO CALCULATE VARIANCE FROM M.E. (Course at LEIC).
+    res.max_difference = maxdifference;
+    res.n_edges = howmany;
+    return res;
+}
+
+
+
+std::vector<std::pair<Edge*, float>> Algorithms::BalanceTheLoad(Graph* g){
+    // THere is an easy way: to just do the Edmond Karp with the edge from city to sink having a capacity given by the city's need.
+    // There is the hard way: to go to each city that has too much water, remove the excess and update the edges until finding a reservoir
+    GlobalStatisticsEdges stats = calculatestatistics(g);
+    Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
+    /*
+     * calculate the statistics in the beginning
+     * for(all the cities)
+     *  if(city capacity > demand)
+     *      excess = capacity - demand;
+     *      remove that excess from the capacity of the city
+     *      repeat:
+     *        find a path from the city to reservoir
+     *        find the max weight of the path
+     *        remove that weight (max(weight, excess))
+     *        decrease excess by how much it was removed
+     *      until excess <= 0;
+     *
+     * calculate statistics again
+     * */
+    return {{nullptr, 1.0}};
+}
+
+
+
+
+
+
+
 
 
 std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)

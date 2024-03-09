@@ -7,6 +7,7 @@
 
 
 #include "../graph/Graph.h"
+#include "../Menu.h"
 #include <queue>
 #include <climits>
 #include <iostream>
@@ -21,6 +22,12 @@ struct WaterLossOnStationDelete{
     std::vector<CityWaterLoss> waterLoss;
 };
 
+struct GlobalStatisticsEdges{
+    float avg;
+    float variance;
+    int max_difference;
+    int n_edges; // number of edges
+};
 
 typedef std::pair<std::string,std::string>PipeStartEndCodes; // Start Code, End Code of Pipe
 
