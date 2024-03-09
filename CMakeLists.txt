@@ -9,4 +9,6 @@ add_executable(project main.cpp
         Menu.cpp
         Menu.h
         graph/Graph.h
-        graph/Graph.cpp)
+        graph/Graph.cpp
+        Algorithms/Algorithms.h
+        Algorithms/Algorithms.cpp)

@@ -13,28 +13,36 @@ Graph* Parser::parse(const std::string& reservoirFilePath, const std::string& st
 const std::string& cityFilePath, const std::string& pipeFilePath)
 {
 
-    auto getUntilComma=[]( istringstream& data, std::string& toSet){
+    auto getUntilComma=[]( istringstream& data, std::string& toSet,char end=',') {
     
-    ostringstream helper;
-    char c;
-    do
-    {
-    data >> c;
-    }while (c==',');
-    
-    while (c!=',')
-    {
-       helper << c; 
-    data >> c;
-    }
-    toSet = helper.str();
-    helper.clear();
+        getline(data, toSet, end);
     };
 
-    auto getLong=[](istringstream& data, long& toSet){
-    data>>toSet;
-    data.ignore(1);
+    auto getLong=[](istringstream& data, long& toSet, char end = ','){
+
+        std::string line;
+        getline(data, line, end);
+        if (line != "")
+        {
+            toSet = stol(line);
+        }
     };
+    auto getInt = [](istringstream& data, int& toSet, char end = ',') {
+        std::string line;
+        getline(data, line, end);
+        if (line!="")
+        {
+            toSet = stoi(line);
+        }
+        };
+    auto getDouble = [](istringstream& data, double& toSet, char end = ',') {
+        std::string line;
+        getline(data, line, end);
+        if (line != "")
+        {
+            toSet = stod(line);
+        }
+        };
 
 Graph* graph= new Graph();
 
@@ -71,7 +79,10 @@ while (getline(reservoirFile,line))
 
 //initializing stations
 {
-ifstream stationFile(stationFilePath);
+
+   
+
+    ifstream stationFile(stationFilePath);
 getline(stationFile,line); //The first line doesn't contain valid information
 while (getline(stationFile,line))
 {
@@ -79,9 +90,9 @@ while (getline(stationFile,line))
 
 
     string code;
-    long id;
+    int id;
 
-    getLong(stationData,id);
+    getInt(stationData,id);
     getUntilComma(stationData,code);
     if (code!="")
     {
@@ -93,9 +104,8 @@ while (getline(stationFile,line))
     }
     
 }
+
 }
-
-
 
 {
 ifstream cityFile(cityFilePath);
@@ -106,15 +116,27 @@ while (getline(cityFile,line))
 
 
     string name,code;
-    long id,population;
+    int id; long population = 0;
     double demand;
 
-    getUntilComma(cityData,code);
-    cityData>>id;
-    getUntilComma(cityData,code);
-    cityData>>demand;
-    cityData>>population;
+    getUntilComma(cityData,name,',');
+    getInt(cityData,id, ',');
+    getUntilComma(cityData,code, ',');
+    getDouble(cityData,demand);
+    cityData.ignore(1);
+    std::string helper,helper2;
+    getUntilComma(cityData, helper,'\"');
+    for (char c: helper) {
+        if (c!=',')
+        {
+            helper2 += c;
+        }
+    }
+    if (helper2!="")
+    {
+        population = stol(helper2);
 
+    }
 
     if (code!=""&&name!="")
     {
@@ -154,14 +176,14 @@ while (getline(pipeFile,line))
     {
         if (isBi)
         {
-            graph->addBidirectionalEdge(codeOrigin,codeDestination,capacity);
+            graph->addEdge(codeOrigin,codeDestination,capacity);
         }else
         {
-         graph->addEdge(codeOrigin,codeDestination,capacity);    
+         graph->addBidirectionalEdge(codeOrigin,codeDestination,capacity);
         }
         
     }
-    //else
+    else
     {
         cout<<"Unexpected line found in "<<pipeFilePath<<":"<<line<<"\n";
     }
@@ -173,5 +195,5 @@ while (getline(pipeFile,line))
 
 
 
-return 0;
+return graph;
 }
