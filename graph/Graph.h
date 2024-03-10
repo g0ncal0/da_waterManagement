@@ -136,7 +136,7 @@ protected:
     Vertex *orig;
     Edge *reverse = nullptr;
 
-    double flow; // for flow-related problems
+    double flow = 0; // for flow-related problems
 public:
     Edge(Vertex *orig, Vertex *dest, double capacity);
 
