@@ -111,6 +111,13 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
     g->removeVertex(source);
     g->removeVertex(sink);
+
+    for (Vertex* v : g->getVertexSet()) {
+        if (v->getType() == 'r') {
+            v->setPath(nullptr);
+            v->clearIncoming();
+        }
+    }
 }
 
 
