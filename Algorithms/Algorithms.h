@@ -69,6 +69,10 @@ public:
     //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);
     static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
 
+    //extra/helper:
+    static void SetWaterIn(Graph* g);
+
+
 };
 
 

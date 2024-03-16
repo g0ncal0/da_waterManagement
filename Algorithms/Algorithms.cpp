@@ -798,3 +798,27 @@ q.push(reservoir);
     return cityWaterLoss; //this data structure is currently not being populated
 
 }
+
+ void Algorithms::SetWaterIn(Graph* graph)
+{
+    for (Vertex* vert:graph->getVertexSet())
+    {
+        if (vert->getType()=='c')
+        {
+            City* city = (City*)vert;
+
+            double waterReceived = 0;
+
+            for (auto incomingEdge:city->getIncoming())
+            {
+                waterReceived+=incomingEdge->getFlow();
+
+            }
+            city->setTotalWaterIn(waterReceived);
+
+
+
+
+        }
+    }
+}

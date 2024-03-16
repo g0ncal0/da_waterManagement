@@ -21,6 +21,28 @@ try {
         return 1;
     }
 
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    auto res1= Algorithms::CanShutDownReservoirOptimized(graph,"R_3");
+
+    Algorithms::simpleEdmondsKarp(graph);
+    Algorithms::SetWaterIn(graph);
+    auto res2= Algorithms::CanShutDownReservoir(graph,"R_3");
+
+
+    for (auto r1:res1)
+    {
+        for (auto r2:res2)
+        {
+            if (r1.cityCode==r2.cityCode&&r1.waterLoss!=r2.waterLoss)
+            {
+                std::cout<<"Difference found: "<<r1.cityCode<<", brute force: "<<r2.waterLoss<<", optimized: "<<r1.waterLoss<<"\n";
+            }
+        }
+    }
+
+return 1;
+
+
 
     Menu::print("Welcome to the Water Management Program.");
     Menu::displayoptions();
@@ -45,6 +67,8 @@ try {
             case 4:
                 Algorithms::BalanceTheLoad(graph);
                 break;
+
+
             default:
                 c = false;
                 break;
