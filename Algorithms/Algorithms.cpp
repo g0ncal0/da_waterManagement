@@ -584,7 +584,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
     Vertex* reservoir=graph->findVertex(reservoirCode);
 
 
-
 //assumes it has already got all the info, including source and sink nodes, in it.
 
     queue<Vertex*> q;
@@ -599,10 +598,10 @@ double waterToRemove=0;
 
 
 
-reservoir->setPath(0);
+reservoir->setPath(nullptr);
 q.push(reservoir);
     // this first loop will remove all the water originating in the reservoir -- not implemented yet
-    bool run = 1;
+    bool run = true;
 
     while (run&&waterToRemove>0) {
         // Re-Initialize everything
@@ -610,7 +609,7 @@ q.push(reservoir);
         reservoir->setVisited(true);
         q.push(reservoir); //I think this is necessary
 
-        run=0;
+        run=false;
         while (!q.empty()) {
             Vertex *v = q.front();
             q.pop();
@@ -624,19 +623,15 @@ q.push(reservoir);
                 //this is the part that needs to change
                 while (edge != nullptr) {
                     if (vertex == edge->getDest()) {
-                        if ((edge->getCapacity() - edge->getFlow()) < minFlow)
-                        {minFlow = edge->getCapacity() - edge->getFlow();}
+                        if ((edge->getFlow()) < minFlow)
+                        { minFlow = edge->getFlow();}
                         vertex = edge->getOrig();
-                    } else {
-                        if (edge->getFlow() < minFlow)
-                        {minFlow = edge->getFlow();}
-                        vertex = edge->getDest();
                     }
 
                     edge = vertex->getPath();
                 }
 
-                minFlow= min((double)minFlow,(waterToRemove));
+                minFlow= std::min((double)minFlow,(waterToRemove));
                 waterToRemove-=minFlow;
 
                 vertex = v;
@@ -647,15 +642,12 @@ q.push(reservoir);
                     if (vertex == edge->getDest()) {
                         edge->setFlow(edge->getFlow() - minFlow);
                         vertex = edge->getOrig();
-                    } else {
-                        edge->setFlow(edge->getFlow() + minFlow);
-                        vertex = edge->getDest();
                     }
 
                     edge = vertex->getPath();
                 }
 
-                run = 1;
+                run = true;
                 contnue = false;
                 q={}; //Maybe remove
             }
@@ -669,7 +661,7 @@ q.push(reservoir);
                     }
                 }
 
-                //* this is wrong, unlike the one above, I think, but I don't know how to fix it...
+                /* this is wrong, unlike the one above, I think, but I don't know how to fix it...
                 for (Edge *edge: v->getIncoming()) {
                     if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 0)) {
                         edge->getOrig()->setPath(edge);
@@ -677,7 +669,7 @@ q.push(reservoir);
                         q.push(edge->getOrig());
                     }
                 }
-
+             */
 
             }
         }
@@ -688,16 +680,15 @@ q.push(reservoir);
 
 
 
-    //this just runs the Edmonds-Karp algorithm, but doesn't start from "the beginning", and ignores the reservoir.
-
+    //this second loop is where the mistake is now...
     q.push(source);
-    run = 1;
+    run = true;
 
     while (run) {
         // Re-Initialize everything
         for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
         source->setVisited(true);
-        run=0;
+        run=false;
         while (!q.empty()) {
             Vertex *v = q.front();
             q.pop();
