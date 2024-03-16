@@ -8,12 +8,28 @@ using namespace std;
 int main() {
     //  Menu::print("hello");
     //
-
+    Graph *graph;
+try {
     Parser p;
-    Graph* graph=p.parse("../data/Small/Reservoirs_Madeira.csv",
-                         "../data/Small/Stations_Madeira.csv",
-                         "../data/Small/Cities_Madeira.csv",
-                         "../data/Small/Pipes_Madeira.csv");
+    graph = p.parse("../data/Small/Reservoirs_Madeira.csv",
+                           "../data/Small/Stations_Madeira.csv",
+                           "../data/Small/Cities_Madeira.csv",
+                           "../data/Small/Pipes_Madeira.csv");
+}   catch (std::exception& e)
+    {
+        std::cout<<"init error: "<<e.what()<< "\n";
+        return 1;
+    }
+
+    try {
+        Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+        auto res = Algorithms::CanShutDownReservoirOptimized(graph, "R_3");
+    } catch (std::exception& e)
+    {
+        std::cout<<"init error: "<<e.what()<< "\n";
+        return 1;
+    }
+
 
     Menu::print("Welcome to the Water Management Program.");
     Menu::displayoptions();

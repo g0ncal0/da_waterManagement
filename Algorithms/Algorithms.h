@@ -46,6 +46,7 @@ public:
    //1
     static bool BFSEdmondsKarp(Graph* g, std::queue<Vertex*> q);
     static void simpleEdmondsKarp(Graph *g);
+    static void simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g);
     //2
     static std::vector<City*> CitiesWithNotEnoughWater(Graph* g);
     //3
@@ -58,6 +59,7 @@ public:
     static bool DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss);
     static std::vector<CityWaterLoss> smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
     static std::vector<CityWaterLoss> CanShutDownReservoirs(Graph* graph, const std::vector<std::string>& reservoirCode);
+    static std::vector<CityWaterLoss> CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode);
 
     //5)
     //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph* graph);
