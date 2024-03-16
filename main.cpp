@@ -21,15 +21,6 @@ try {
         return 1;
     }
 
-    try {
-        Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
-        auto res = Algorithms::CanShutDownReservoirOptimized(graph, "R_3");
-    } catch (std::exception& e)
-    {
-        std::cout<<"init error: "<<e.what()<< "\n";
-        return 1;
-    }
-
 
     Menu::print("Welcome to the Water Management Program.");
     Menu::displayoptions();

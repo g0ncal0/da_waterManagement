@@ -568,7 +568,7 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
 
     for (Vertex* vertex:graph->getVertexSet()) {
-        if(vertex->getType()=='c')
+        if(vertex->getType()=='c'&&vertex->getCode()!="Sink")
         {
             double waterIn=0;
             for (Edge* edge:vertex->getIncoming()) {
@@ -686,7 +686,7 @@ q.push(reservoir);
 
     while (run) {
         // Re-Initialize everything
-        for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
+        for (Vertex* v : graph->getVertexSet()) {v->setVisited(false);}
         source->setVisited(true);
         run=false;
         while (!q.empty()) {
@@ -702,11 +702,12 @@ q.push(reservoir);
 
                 while (edge != nullptr) {
                     if (vertex == edge->getDest()) {
-                        if ((edge->getCapacity() - edge->getFlow()) < minFlow) minFlow = edge->getCapacity() -
-                                                                                         edge->getFlow();
+                        if ((edge->getCapacity() - edge->getFlow()) < minFlow)
+                        { minFlow = edge->getCapacity() -edge->getFlow();}
                         vertex = edge->getOrig();
                     } else {
-                        if (edge->getFlow() < minFlow) minFlow = edge->getFlow();
+                        if (edge->getFlow() < minFlow)
+                        {minFlow = edge->getFlow();}
                         vertex = edge->getDest();
                     }
 
@@ -728,7 +729,7 @@ q.push(reservoir);
                     edge = vertex->getPath();
                 }
 
-                run = 1;
+                run = true;
                 contnue = false;
             }
 
@@ -765,6 +766,12 @@ q.push(reservoir);
 
 
     }
+
+
+
+
+
+
 
 
 
