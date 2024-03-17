@@ -38,6 +38,7 @@ int main() {
             case 4:
                 Algorithms::BalanceTheLoad(graph);
                 break;
+
             default:
                 c = false;
                 break;

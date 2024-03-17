@@ -6,6 +6,23 @@
 
 using namespace std;
 
+
+/**
+ * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities.
+ * @param g graph
+ */
+void Algorithms::calculateWaterInCities(Graph* g){
+    for(Vertex* v: g->getVertexSet()){
+        if(v->getType() == 'c'){
+            City* c = (City*) v;
+            c->setTotalWaterIn(0);
+            for(Edge* in : c->getIncoming()){
+                c->setTotalWaterIn(c->getTotalWaterIn() + in->getFlow());
+            }
+        }
+    }
+}
+
 bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     while (!q.empty()) {
         Vertex* v = q.front();
@@ -111,6 +128,10 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
 
     g->removeVertex(source);
     g->removeVertex(sink);
+
+
+    // Added the calculus of the incoming water in cities.
+    calculateWaterInCities(g);
 }
 
 
@@ -166,8 +187,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
 
     std::vector<CityWaterLoss> wl;
 
-
-
     //temporary algorithm, that must run edmonds-karp every time
     Graph* copy= graph->clone();
     for (const auto& reservoirCode:reservoirCodes) {
@@ -175,20 +194,14 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
     }
     simpleEdmondsKarp(copy);
 
+
+    calculateWaterInCities(copy); // this calculates the water in
+
     for (Vertex* vert:copy->getVertexSet())
     {
         if (vert->getType()=='c')
         {
             City* city = (City*)vert;
-
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getAdj())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
 
             City *originalCity=(City*)graph->findVertex(city->getCode());
 
@@ -214,19 +227,22 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
     // Calculate avg (with sum of differences) and maxdifference
     for(Vertex* vertex : g->getVertexSet()){
         for(Edge* edge : vertex->getAdj()){
-            int difference = edge->getCapacity() - edge->getFlow();
-            sum += difference;
-            sumforvariance += difference * difference;
-            howmany++;
-            if(difference > maxdifference){
-                maxdifference = difference;
+            if(edge->getFlow() >= 0){
+                // we guarantee that the edges we are analysing are the originals and not the "reverse"
+                int difference = edge->getCapacity() - edge->getFlow();
+                sum += difference;
+                sumforvariance += difference * difference;
+                howmany++;
+                if(difference > maxdifference){
+                    maxdifference = difference;
+                }
             }
         }
     }
     GlobalStatisticsEdges res;
 
     res.avg = (float) sum / (float) howmany;
-    res.variance = ((float) sumforvariance - (float) howmany * res.avg) / (float) (howmany - 1); // FORMULA TO CALCULATE VARIANCE FROM M.E. (Course at LEIC).
+    res.variance = ((float) sumforvariance - (float) howmany * (res.avg * res.avg)) / (float) (howmany - 1); // FORMULA TO CALCULATE VARIANCE FROM M.E. (Course at LEIC).
     res.max_difference = maxdifference;
     res.n_edges = howmany;
     return res;
@@ -234,7 +250,7 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
 
 
 
-std::vector<std::pair<Edge*, float>> Algorithms::BalanceTheLoad(Graph* g){
+void Algorithms::BalanceTheLoad(Graph* g){
     // THere is an easy way: to just do the Edmond Karp with the edge from city to sink having a capacity given by the city's need.
     // There is the hard way: to go to each city that has too much water, remove the excess and update the edges until finding a reservoir
     GlobalStatisticsEdges stats = calculatestatistics(g);
@@ -254,7 +270,17 @@ std::vector<std::pair<Edge*, float>> Algorithms::BalanceTheLoad(Graph* g){
      *
      * calculate statistics again
      * */
-    return {{nullptr, 1.0}};
+    for(Vertex* vertex : g->getVertexSet()){
+        if(vertex->getType() == 'c'){
+            City* city = (City*) vertex;
+            int excess = city->getTotalWaterIn() - city->getDemand();
+            if(excess > 0){
+
+            }
+        }
+    }
+
+
 }
 
 

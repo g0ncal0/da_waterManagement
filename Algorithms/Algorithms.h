@@ -43,6 +43,7 @@ struct WaterLossOnPipeDelete{
 
 class Algorithms {
 public:
+    static void calculateWaterInCities(Graph* g);
    //1
     static bool BFSEdmondsKarp(Graph* g, std::queue<Vertex*> q);
     static void simpleEdmondsKarp(Graph *g);
@@ -50,7 +51,7 @@ public:
     static std::vector<City*> CitiesWithNotEnoughWater(Graph* g);
     //3
     // Store on pair (Pipe, float) for each pipe the percentage of decrease/increase that it had after balance
-    static std::vector<std::pair<Edge*, float>> BalanceTheLoad(Graph* g);
+    static void BalanceTheLoad(Graph* g);
 
     //4
     //returns affected cities
