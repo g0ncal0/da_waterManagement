@@ -129,9 +129,18 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
     g->removeVertex(source);
     g->removeVertex(sink);
 
+<<<<<<< HEAD
 
     // Added the calculus of the incoming water in cities.
     calculateWaterInCities(g);
+=======
+    for (Vertex* v : g->getVertexSet()) {
+        if (v->getType() == 'r') {
+            v->setPath(nullptr);
+            v->clearIncoming();
+        }
+    }
+>>>>>>> 7f3c908f3e60c4e0978fe3f64a1e2ec2dae27214
 }
 
 

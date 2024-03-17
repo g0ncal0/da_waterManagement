@@ -74,6 +74,7 @@ public:
     void setProcessing(bool processing);
     void setDist(double dist);
     void setPath(Edge *path);
+    void clearIncoming();
 
     friend class Graph;
 };

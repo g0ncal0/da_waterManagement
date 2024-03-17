@@ -77,20 +77,20 @@ bool Graph::addVertex(Vertex* vert) {
 }
 
 Vertex* Graph::findVertex(const std::string& code)
+{
+    for (size_t i = 0; i <vertexSet.size(); i++)
     {
-        for (size_t i = 0; i <vertexSet.size(); i++)
+        if (vertexSet[i]->getCode() == code)
         {
-            if (vertexSet[i]->getCode() == code)
-            {
-                return vertexSet[i];
-            }
-            
+            return vertexSet[i];
         }
-        return NULL;
+
     }
+    return NULL;
+}
 
 bool Graph::removeVertex(Vertex* in) {
-    
+
 
     for (auto it = vertexSet.begin(); it != vertexSet.end(); it++) {
         if ((*it) == in) {
@@ -108,7 +108,7 @@ bool Graph::removeVertex(Vertex* in) {
     return false;
 }
 
-    std::vector<Vertex*> Graph::getVertexSet() const{return vertexSet;}
+std::vector<Vertex*> Graph::getVertexSet() const{return vertexSet;}
 
 
 
@@ -159,121 +159,121 @@ Vertex* Graph::addStation(int id, std::string &code){
 }
 
 
-    bool Graph::addEdge(const std::string& origin,const std::string& target, double capacity )
+bool Graph::addEdge(const std::string& origin,const std::string& target, double capacity )
+{
+    auto firstVertex=findVertex(origin);
+    auto secondVertex=findVertex(target);
+    if (secondVertex==NULL||firstVertex==NULL)
     {
-        auto firstVertex=findVertex(origin);
-        auto secondVertex=findVertex(target);
-        if (secondVertex==NULL||firstVertex==NULL)
-        {
-            return 1;
-        }
-        auto edge= new Edge(firstVertex,secondVertex,capacity);
-        firstVertex->addOutgoingEdge(edge);
-        secondVertex->addIncomingEdge(edge);
-        
-return 0;
+        return 1;
     }
-    //this can't be here because it need to call a function from the vertex which isn't defined yet...
-    bool Graph::addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity){
-        auto firstVertex=findVertex(vertexA);
-        auto secondVertex=findVertex(vertexB);
-        if (secondVertex==NULL||firstVertex==NULL)
-        {
-            return 1;
-        }
+    auto edge= new Edge(firstVertex,secondVertex,capacity);
+    firstVertex->addOutgoingEdge(edge);
+    secondVertex->addIncomingEdge(edge);
 
-        auto edge1= new Edge(firstVertex,secondVertex,capacity);
-        auto edge2= new Edge(secondVertex,firstVertex,capacity);
-        edge1->setReverse(edge2);
-        edge2->setReverse(edge1); 
-        firstVertex->addOutgoingEdge(edge1);
-        secondVertex->addIncomingEdge(edge1);
-        firstVertex->addIncomingEdge(edge2);
-        secondVertex->addOutgoingEdge(edge2);
-return 0;
+    return 0;
+}
+//this can't be here because it need to call a function from the vertex which isn't defined yet...
+bool Graph::addBidirectionalEdge(const std::string& vertexA,const std::string& vertexB, double capacity){
+    auto firstVertex=findVertex(vertexA);
+    auto secondVertex=findVertex(vertexB);
+    if (secondVertex==NULL||firstVertex==NULL)
+    {
+        return 1;
     }
+
+    auto edge1= new Edge(firstVertex,secondVertex,capacity);
+    auto edge2= new Edge(secondVertex,firstVertex,capacity);
+    edge1->setReverse(edge2);
+    edge2->setReverse(edge1);
+    firstVertex->addOutgoingEdge(edge1);
+    secondVertex->addIncomingEdge(edge1);
+    firstVertex->addIncomingEdge(edge2);
+    secondVertex->addOutgoingEdge(edge2);
+    return 0;
+}
 
 
 
 ///_____EDGE_____
-    Edge::Edge(Vertex *orig, Vertex *dest, double capacity){
-        this->orig = orig;
-        this->dest = dest;
-        this->capacity = capacity;
-    }
+Edge::Edge(Vertex *orig, Vertex *dest, double capacity){
+    this->orig = orig;
+    this->dest = dest;
+    this->capacity = capacity;
+}
 
-    Vertex * Edge::getDest() const{return dest;}
-    double Edge::getCapacity() const{return capacity;}
-    bool Edge::isSelected() const{return selected;}
-    Vertex * Edge::getOrig() const{return orig;}
-    Edge *Edge::getReverse() const{return reverse;}
-    double Edge::getFlow() const{return flow;}
+Vertex * Edge::getDest() const{return dest;}
+double Edge::getCapacity() const{return capacity;}
+bool Edge::isSelected() const{return selected;}
+Vertex * Edge::getOrig() const{return orig;}
+Edge *Edge::getReverse() const{return reverse;}
+double Edge::getFlow() const{return flow;}
 
-    void Edge::setSelected(bool selected){this->selected = selected;}
-    void Edge::setReverse(Edge *reverse){this->reverse = reverse;}
-    void Edge::setFlow(double flow){this->flow = flow;};
+void Edge::setSelected(bool selected){this->selected = selected;}
+void Edge::setReverse(Edge *reverse){this->reverse = reverse;}
+void Edge::setFlow(double flow){this->flow = flow;};
 ///____CITY_____
-        Vertex* City::clone() const
-        {
-            return new City(name,id,code,demand,population);
+Vertex* City::clone() const
+{
+    return new City(name,id,code,demand,population);
 
-        }
-    City::City(const std::string &name, int id, const std::string &code, int demand, int population) : Vertex(id,code){
-        this->name = name;
-        this->id = id;
-        this->demand = demand;
-        this->population = population;
-    }
+}
+City::City(const std::string &name, int id, const std::string &code, int demand, int population) : Vertex(id,code){
+    this->name = name;
+    this->id = id;
+    this->demand = demand;
+    this->population = population;
+}
 
-    /*City::City() : Vertex() {
-        this->name = "";
-        this->id = 0;
-        this->demand = 0;
-        this->population = 0;
-    }*/
+/*City::City() : Vertex() {
+    this->name = "";
+    this->id = 0;
+    this->demand = 0;
+    this->population = 0;
+}*/
 
-    char City::getType() { return 'c';}
+char City::getType() { return 'c';}
 
-    std::string City::getName(){return name;}
-    int City::getDemand(){return demand;}
-    double City::getTotalWaterIn() const {
-        return totalWaterIn;
-    }
-    void City::setTotalWaterIn(double totalWaterIn) {
-        this->totalWaterIn = totalWaterIn;
-    }
+std::string City::getName(){return name;}
+int City::getDemand(){return demand;}
+double City::getTotalWaterIn() const {
+    return totalWaterIn;
+}
+void City::setTotalWaterIn(double totalWaterIn) {
+    this->totalWaterIn = totalWaterIn;
+}
 
 ///_____RESERVOIR_____
 Vertex* Reservoir::clone() const{
-        return new Reservoir(name,municipality,id,code,delivery);
+    return new Reservoir(name,municipality,id,code,delivery);
 
-    }
-    Reservoir::Reservoir(const std::string &name, const std::string &municipality, int id, const std::string &code, int delivery) : Vertex(id,code){
-        this->name = name;
-        this->municipality = municipality;
-        this->delivery = delivery;
-    }
-    char Reservoir::getType() { return 'r';}
+}
+Reservoir::Reservoir(const std::string &name, const std::string &municipality, int id, const std::string &code, int delivery) : Vertex(id,code){
+    this->name = name;
+    this->municipality = municipality;
+    this->delivery = delivery;
+}
+char Reservoir::getType() { return 'r';}
 
-    int Reservoir::getDelivery() const {
-        return delivery;
-    }
+int Reservoir::getDelivery() const {
+    return delivery;
+}
 
-    int Reservoir::getActualDelivery() const {
-        return actualDelivery;
-    }
+int Reservoir::getActualDelivery() const {
+    return actualDelivery;
+}
 
-    void Reservoir::setActualDelivery(int actualDelivery) {
-        this->actualDelivery = actualDelivery;
-    }
+void Reservoir::setActualDelivery(int actualDelivery) {
+    this->actualDelivery = actualDelivery;
+}
 ///___Station___
-    Vertex* Station::clone() const
-    {
-        return new Station(id,code);
-    }
+Vertex* Station::clone() const
+{
+    return new Station(id,code);
+}
 
-    Station::Station(int id, const std::string &code) : Vertex(id, code){}
-    char Station::getType() { return 's';}
+Station::Station(int id, const std::string &code) : Vertex(id, code){}
+char Station::getType() { return 's';}
 
 ///___VERTEX____
 
@@ -337,7 +337,7 @@ void Vertex::setPath(Edge *path) {
     this->path = path;
 }
 
-void Vertex::removeOutgoingEdges() 
+void Vertex::removeOutgoingEdges()
 {
     for (Edge* edge:adj)
     {
@@ -350,6 +350,7 @@ bool Vertex::removeEdgeTo(Vertex *d) {
     // HINT: use an iterator to scan the "adj" vector and then erase the edge.
     for (auto it = adj.begin(); it != adj.end(); it++) {
         if ((*it)->getDest() == d) {
+            delete(*it);
             adj.erase(it);
             return true;
         }
@@ -367,4 +368,8 @@ bool Vertex::deleteEdgeTo(Vertex *d)
         }
     }
     return false;
+}
+
+void Vertex::clearIncoming() {
+    incoming.clear();
 }
