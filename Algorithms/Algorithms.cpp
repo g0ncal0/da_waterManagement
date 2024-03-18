@@ -970,3 +970,45 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* g
 
     return cityWaterLoss;
 }
+
+
+//Doesn't change flow of existing edges...
+static void AddSourceAndSink(Graph* graph)
+{
+    for (Vertex* v : graph->getVertexSet()) {
+
+        if ((v->getType() == 'r') && (v->getCode() != "Source")) {
+            auto* reservoir = dynamic_cast<Reservoir*>(v);
+            int outgoingFlow=0;
+            for (Edge* edge: v->getAdj()) {
+                outgoingFlow+=edge->getFlow();
+            }
+
+            graph->addEdge("Source", v->getCode(), reservoir->getDelivery());
+            for (Edge* edge: v->getIncoming()) {
+                if(edge->getOrig()->getCode()=="Source")
+                {
+                    edge->setFlow(outgoingFlow);
+                    break;
+                }
+            }
+        }
+        else if ((v->getType() == 'c') && (v->getCode() != "Sink"))
+        {
+                int incomingFlow=0;
+            for (Edge* edge: v->getIncoming()) {
+                incomingFlow+=edge->getFlow();
+            }
+
+            graph->addEdge(v->getCode(), "Sink", INT_MAX);
+            for (Edge* edge: v->getAdj()) {
+                if(edge->getDest()->getCode()=="Sink")
+                {
+                    edge->setFlow(incomingFlow);
+                    break;
+                }
+            }
+        }
+    }
+
+}

@@ -73,6 +73,7 @@ static std::vector<CityWaterLoss> CanDeletePumpingStationOptimized(Graph* graph,
     //extra/helper:
     static void SetWaterIn(Graph* g);
 
+    static void AddSourceAndSink(Graph* g);
 
 };
 
