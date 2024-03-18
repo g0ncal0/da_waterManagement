@@ -600,15 +600,15 @@ double waterToRemove=0;
 
 reservoir->setPath(nullptr);
 q.push(reservoir);
-    // this first loop will remove all the water originating in the reservoir -- not implemented yet
+
     bool run = true;
+//This loop is something similar to the Edmonds-Karp algorithm. It detects paths from the reservoir to the sink that have flow going through them. It removes that flow until there is no flow coming from the reservoir.
 
     while (run&&waterToRemove>0) {
         // Re-Initialize everything
         for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
         reservoir->setVisited(true);
-        q.push(reservoir); //I think this is necessary
-
+        q.push(reservoir);
         run=false;
         while (!q.empty()) {
             Vertex *v = q.front();
@@ -637,7 +637,7 @@ q.push(reservoir);
                 vertex = v;
                 edge = v->getPath();
 
-                while (edge != nullptr)//this condition needs to be changed
+                while (edge != nullptr)
                 {
                     if (vertex == edge->getDest()) {
                         edge->setFlow(edge->getFlow() - minFlow);
@@ -661,7 +661,7 @@ q.push(reservoir);
                     }
                 }
 
-                /* this is wrong, unlike the one above, I think, but I don't know how to fix it...
+                /*
                 for (Edge *edge: v->getIncoming()) {
                     if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 0)) {
                         edge->getOrig()->setPath(edge);
@@ -680,7 +680,7 @@ q.push(reservoir);
 
 
 
-    //this second loop is where the mistake is now...
+    //This is a simple edmonds-karp algorithm, except that the reservoir is being ignored.
     q.push(source);
     run = true;
 
