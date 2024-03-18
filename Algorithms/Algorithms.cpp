@@ -593,7 +593,7 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 
                 //this is the part that needs to change
                 while (edge != nullptr) {
-                    if (vertex == edge->getDest()) {
+                    if (vert == edge->getDest()) {
                         if ((edge->getFlow()) < minFlow)
                         { minFlow = edge->getFlow();}
                         vert = edge->getOrig();
