@@ -596,7 +596,7 @@ double waterToRemove=0;
             waterToRemove+=edge->getFlow();
     }
 
-
+//TODO: pôr em diferentes funções
 
 reservoir->setPath(nullptr);
 q.push(reservoir);
