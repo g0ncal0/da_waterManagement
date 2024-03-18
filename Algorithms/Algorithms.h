@@ -64,7 +64,7 @@ public:
     //5)
     //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph* graph);
     static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph);
-static std::vector<CityWaterLoss> CanDeletePumpingStation(Graph* graph, const std::string& stationCode);
+static std::vector<CityWaterLoss> CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode);
 
      //6)
     //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);

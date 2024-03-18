@@ -558,6 +558,7 @@ std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedS
 
 }
 
+//TODO: this is failing, check why
 void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 {
 
@@ -568,8 +569,6 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
         waterToRemove+=edge->getFlow();
     }
 
-//TODO: pôr em diferentes funções
-
     vertex->setPath(nullptr);
     q.push(vertex);
 
@@ -578,7 +577,7 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 
     while (run&&waterToRemove>0) {
         // Re-Initialize everything
-        for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
+        for (Vertex* v : graph->getVertexSet()) {v->setVisited(false);}
         vertex->setVisited(true);
         q.push(vertex);
         run=false;
@@ -839,14 +838,97 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
 
 
-void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vert)
+void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vertex)
 {
+    queue<Vertex*> q;
+
+    double waterToRemove=0;
+    for (Edge* edge:vertex->getIncoming()) {
+        waterToRemove+=edge->getFlow();
+    }
+
+    vertex->setPath(nullptr);
+    q.push(vertex);
+
+    bool run = true;
+
+    while (run&&waterToRemove>0) {
+        // Re-Initialize everything
+        for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
+        vertex->setVisited(true);
+        q.push(vertex);
+        run=false;
+        while (!q.empty()) {
+            Vertex *v = q.front();
+            q.pop();
+            bool contnue = true;
+
+            if (v->getCode() == "Source") {
+                int minFlow = INT_MAX; //should be double
+                Vertex *vert = vertex;
+                Edge *edge = v->getPath();
+
+                //this is the part that needs to change
+                while (edge != nullptr) {
+                    if (vertex == edge->getDest()) {
+                        if ((edge->getFlow()) < minFlow)
+                        { minFlow = edge->getFlow();}
+                        vert = edge->getOrig();
+                    }
+
+                    edge = vert->getPath();
+                }
+
+                minFlow= std::min((double)minFlow,(waterToRemove));
+                waterToRemove-=minFlow;
+
+                vert = vertex;
+                edge = v->getPath();
+
+                while (edge != nullptr)
+                {
+                    if (vert == edge->getDest()) {
+                        edge->setFlow(edge->getFlow() - minFlow);
+                        vert = edge->getOrig();
+                    }
+
+                    edge = vert->getPath();
+                }
+
+                run = true;
+                contnue = false;
+                q={}; //Maybe remove
+            }
+
+            if (contnue) {
+                /*
+                for (Edge *edge: v->getAdj()) {
+                    if ((!edge->getDest()->isVisited()) && (edge->getFlow() >0)) {
+                        edge->getDest()->setPath(edge);
+                        edge->getDest()->setVisited(true);
+                        q.push(edge->getDest());
+                    }
+                }*/
+
+                for (Edge *edge: v->getIncoming()) {
+                    if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 0)) {
+                        edge->getOrig()->setPath(edge);
+                        edge->getOrig()->setVisited(true);
+                        q.push(edge->getOrig());
+                    }
+                }
+
+            }
+        }
+
+
+    }
 
 }
 
 
 
-std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStation(Graph* graph, const std::string& stationCode)
+std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode)
 {
     std::vector<CityWaterLoss> cityWaterLoss;
 

@@ -20,7 +20,7 @@ try {
         std::cout<<"init error: "<<e.what()<< "\n";
         return 1;
     }
-/*
+
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     auto res1= Algorithms::CanShutDownReservoirOptimized(graph,"R_3");
 
@@ -40,9 +40,12 @@ try {
         }
     }
 
-return 1;
-*/
 
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    auto res=Algorithms::CanDeletePumpingStationOptimized(graph,"PS_11");
+
+
+    return 1;
 
     Menu::print("Welcome to the Water Management Program.");
     Menu::displayoptions();
