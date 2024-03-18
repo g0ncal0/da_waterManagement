@@ -71,7 +71,7 @@ Graph* Graph::clone() const
 /**
  * Add a Vertex to the graph
  * @param vert a pointer to the new vertex
- * @return true if sucess
+ * @return true if success
  */
 bool Graph::addVertex(Vertex* vert) {
     if(findVertex(vert->getCode()))
