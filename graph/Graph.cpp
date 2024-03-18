@@ -67,6 +67,12 @@ Graph* Graph::clone() const
     }
     return graph;
 }
+
+/**
+ * Add a Vertex to the graph
+ * @param vert a pointer to the new vertex
+ * @return true if sucess
+ */
 bool Graph::addVertex(Vertex* vert) {
     if(findVertex(vert->getCode()))
     {
