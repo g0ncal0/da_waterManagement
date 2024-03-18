@@ -558,57 +558,29 @@ std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedS
 
 }
 
-
-#include <unordered_map>
-std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode)
+void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 {
-    std::vector<CityWaterLoss> cityWaterLoss;
-
-    std::unordered_map<City*, double> originalWaterValue; //TODO: use this to populate the above vector later.
-
-
-    for (Vertex* vertex:graph->getVertexSet()) {
-        if(vertex->getType()=='c'&&vertex->getCode()!="Sink")
-        {
-            double waterIn=0;
-            for (Edge* edge:vertex->getIncoming()) {
-                waterIn+=edge->getFlow();
-            }
-
-
-            originalWaterValue.emplace((City*)vertex,waterIn);
-
-        }
-    }
-
-    Vertex* reservoir=graph->findVertex(reservoirCode);
-
-
-//assumes it has already got all the info, including source and sink nodes, in it.
 
     queue<Vertex*> q;
-    Vertex* source=graph->findVertex("Source");
-    Vertex* sink=graph->findVertex("Sink");
 
-
-double waterToRemove=0;
-    for (Edge* edge:reservoir->getAdj()) {
-            waterToRemove+=edge->getFlow();
+    double waterToRemove=0;
+    for (Edge* edge:vertex->getAdj()) {
+        waterToRemove+=edge->getFlow();
     }
 
 //TODO: pôr em diferentes funções
 
-reservoir->setPath(nullptr);
-q.push(reservoir);
+    vertex->setPath(nullptr);
+    q.push(vertex);
 
     bool run = true;
-//This loop is something similar to the Edmonds-Karp algorithm. It detects paths from the reservoir to the sink that have flow going through them. It removes that flow until there is no flow coming from the reservoir.
+//This loop is something similar to the Edmonds-Karp algorithm. It detects paths from the vertex to the sink that have flow going through them. It removes that flow until there is no flow coming from the vertex.
 
     while (run&&waterToRemove>0) {
         // Re-Initialize everything
         for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
-        reservoir->setVisited(true);
-        q.push(reservoir);
+        vertex->setVisited(true);
+        q.push(vertex);
         run=false;
         while (!q.empty()) {
             Vertex *v = q.front();
@@ -617,7 +589,7 @@ q.push(reservoir);
 
             if (v->getCode() == "Sink") {
                 int minFlow = INT_MAX; //should be double
-                Vertex *vertex = v;
+                Vertex *vert = v;
                 Edge *edge = v->getPath();
 
                 //this is the part that needs to change
@@ -625,26 +597,26 @@ q.push(reservoir);
                     if (vertex == edge->getDest()) {
                         if ((edge->getFlow()) < minFlow)
                         { minFlow = edge->getFlow();}
-                        vertex = edge->getOrig();
+                        vert = edge->getOrig();
                     }
 
-                    edge = vertex->getPath();
+                    edge = vert->getPath();
                 }
 
                 minFlow= std::min((double)minFlow,(waterToRemove));
                 waterToRemove-=minFlow;
 
-                vertex = v;
+                vert = v;
                 edge = v->getPath();
 
                 while (edge != nullptr)
                 {
-                    if (vertex == edge->getDest()) {
+                    if (vert == edge->getDest()) {
                         edge->setFlow(edge->getFlow() - minFlow);
-                        vertex = edge->getOrig();
+                        vert = edge->getOrig();
                     }
 
-                    edge = vertex->getPath();
+                    edge = vert->getPath();
                 }
 
                 run = true;
@@ -677,10 +649,15 @@ q.push(reservoir);
 
     }
 
+}
 
+void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)
+{
+    queue<Vertex*> q;
+    bool run=true;
+    Vertex* source=graph->findVertex("Source");
+    Vertex* sink=graph->findVertex("Sink");
 
-
-    //This is a simple edmonds-karp algorithm, except that the reservoir is being ignored.
     q.push(source);
     run = true;
 
@@ -736,7 +713,7 @@ q.push(reservoir);
             if (contnue) {
 
                 for (Edge *edge: v->getAdj()) {
-                    if(edge->getDest()==reservoir)
+                    if(edge->getDest() == vertx)
                     {
                         continue;
                     }
@@ -748,7 +725,7 @@ q.push(reservoir);
                 }
 
                 for (Edge *edge: v->getIncoming()) {
-                    if(edge->getOrig()==reservoir)
+                    if(edge->getOrig() == vertx)
                     {
                         continue;
                     }
@@ -768,10 +745,47 @@ q.push(reservoir);
     }
 
 
+}
 
 
+#include <unordered_map>
+std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode)
+{
+    std::vector<CityWaterLoss> cityWaterLoss;
+
+    std::unordered_map<City*, double> originalWaterValue; //TODO: use this to populate the above vector later.
 
 
+    for (Vertex* vertex:graph->getVertexSet()) {
+        if(vertex->getType()=='c'&&vertex->getCode()!="Sink")
+        {
+            double waterIn=0;
+            for (Edge* edge:vertex->getIncoming()) {
+                waterIn+=edge->getFlow();
+            }
+
+
+            originalWaterValue.emplace((City*)vertex,waterIn);
+
+        }
+    }
+
+    Vertex* reservoir=graph->findVertex(reservoirCode);
+
+
+//assumes it has already got all the info, including source and sink nodes, in it.
+
+    Vertex* source=graph->findVertex("Source");
+    Vertex* sink=graph->findVertex("Sink");
+
+
+    RemoveWaterFromVertexToSink(graph,reservoir);
+
+
+    //This is a simple edmonds-karp algorithm, except that the reservoir is being ignored.
+
+
+    EdmondsKarpThatIgnoresVertex(graph,reservoir);
 
 
 
@@ -795,7 +809,7 @@ q.push(reservoir);
     }
 
 
-    return cityWaterLoss; //this data structure is currently not being populated
+    return cityWaterLoss;
 
 }
 
@@ -821,4 +835,56 @@ q.push(reservoir);
 
         }
     }
+}
+
+
+
+void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vert)
+{
+
+}
+
+
+
+std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStation(Graph* graph, const std::string& stationCode)
+{
+    std::vector<CityWaterLoss> cityWaterLoss;
+
+    std::unordered_map<City*, double> originalWaterValue; //TODO: use this to populate the above vector later.
+    for (Vertex* vertex:graph->getVertexSet()) {
+        if(vertex->getType()=='c'&&vertex->getCode()!="Sink")
+        {
+            double waterIn=0;
+            for (Edge* edge:vertex->getIncoming()) {
+                waterIn+=edge->getFlow();
+            }
+
+
+            originalWaterValue.emplace((City*)vertex,waterIn);
+
+        }
+    }
+
+    Vertex* station= graph->findVertex(stationCode);
+    RemoveWaterFromVertexToSink(graph, station);
+    RemoveWaterFromSourcesToVertex(graph,station);
+    EdmondsKarpThatIgnoresVertex(graph,station);
+    for (std::pair<City*, double> pair:originalWaterValue)
+    {
+        City* first=pair.first;
+
+        double waterIn=0;
+        for (Edge* edge:first->getIncoming()) {
+            waterIn+=edge->getFlow();
+        }
+
+
+        CityWaterLoss wl;
+        wl.waterLoss= waterIn-pair.second;
+        wl.cityCode=first->getCode();
+        cityWaterLoss.push_back(wl);
+    }
+
+
+    return cityWaterLoss;
 }
