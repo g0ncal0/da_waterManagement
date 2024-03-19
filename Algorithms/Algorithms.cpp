@@ -8,36 +8,21 @@ using namespace std;
 
 void Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g)
 {
-    // Creation of SuperSource and SuperSink
-    string name = "SuperSource";
-    string code = "Source";
-    g->addReservoir(name,name,0,code,INT_MAX);
-
-    name = "SuperSink";
-    code = "Sink";
-    g->addCity(name, 0, code, 0, 0);
 
     queue<Vertex*> q;
     Vertex* source;
-    Vertex* sink;
     // Add edges from supersource to sources and sink to supersink + store in q the supersource for bfs
     for (Vertex* v : g->getVertexSet()) {
         v->setVisited(false);
+        v->setPath(0);
         for (Edge* edge : v->getAdj()) edge->setFlow(0);
 
-        if ((v->getType() == 'r') && (v->getCode() != "Source")) {
-            auto* reservoir = dynamic_cast<Reservoir*>(v);
-            g->addEdge("Source", v->getCode(), reservoir->getDelivery());
-        }
-        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) g->addEdge(v->getCode(), "Sink", INT_MAX);
-
-        else if (v->getCode() == "Source") {
+        if (v->getCode() == "Source") {
             v->setVisited(true);
             q.push(v);
             source = v;
         }
 
-        else if (v->getCode() == "Sink") sink = v;
     }
 
     while (BFSEdmondsKarp(g, q)) {
@@ -649,13 +634,11 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
     }
 
 }
-
-void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)
+void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
 {
     queue<Vertex*> q;
     bool run=true;
     Vertex* source=graph->findVertex("Source");
-    Vertex* sink=graph->findVertex("Sink");
 
     q.push(source);
     run = true;
@@ -788,8 +771,8 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
 
 
-    graph->removeVertex(source);
-    graph->removeVertex(sink);
+  //  graph->removeVertex(source);
+  //  graph->removeVertex(sink);
 
     for (std::pair<City*, double> pair:originalWaterValue)
     {
@@ -828,8 +811,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
             }
             city->setTotalWaterIn(waterReceived);
-
-
 
 
         }
@@ -926,6 +907,45 @@ void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vertex)
 
 }
 
+std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode)
+{
+    std::vector<CityWaterLoss> cityWaterLoss;
+    std::unordered_map<City*, double> originalWaterValue; //TODO: use this to populate the above vector later.
+
+    for (Vertex* vertex : graph->getVertexSet() ) {
+
+        if (vertex->getType()=='c'&&vertex->getCode()!="Sink")
+        {
+            City* city=(City*) vertex;
+            originalWaterValue.emplace(city,city->getTotalWaterIn());
+        }
+        for (Edge* e:vertex->getAdj()) {
+            e->setFlow(0);
+        }
+    }
+
+    EdmondsKarpThatIgnoresVertex(graph,graph->findVertex(stationCode));
+
+
+    for (std::pair<City*, double> pair:originalWaterValue)
+    {
+        City* first=pair.first;
+
+        double waterIn=0;
+        for (Edge* edge:first->getIncoming()) {
+            waterIn+=edge->getFlow();
+        }
+
+
+        CityWaterLoss wl;
+        wl.waterLoss= waterIn-pair.second;
+        wl.cityCode=first->getCode();
+        cityWaterLoss.push_back(wl);
+    }
+
+
+    return cityWaterLoss;
+}
 
 
 std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode)
@@ -973,8 +993,17 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* g
 
 
 //Doesn't change flow of existing edges...
-static void AddSourceAndSink(Graph* graph)
+void Algorithms::AddSourceAndSink(Graph* graph)
 {
+
+    // Creation of SuperSource and SuperSink
+    string name = "SuperSource";
+    string code = "Source";
+    graph->addReservoir(name,name,0,code,INT_MAX);
+
+    name = "SuperSink";
+    code = "Sink";
+    graph->addCity(name, 0, code, 0, 0);
     for (Vertex* v : graph->getVertexSet()) {
 
         if ((v->getType() == 'r') && (v->getCode() != "Source")) {

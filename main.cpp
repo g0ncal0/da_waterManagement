@@ -41,9 +41,27 @@ try {
     }
 */
 
-    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
-    auto res=Algorithms::CanDeletePumpingStationOptimized(graph,"PS_11");
+    Algorithms::AddSourceAndSink(graph);
 
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    Algorithms::SetWaterIn(graph);
+    auto res1=Algorithms::CanDeletePumpingStationOptimized(graph,"PS_2");
+
+
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    Algorithms::SetWaterIn(graph);
+    auto res2 = Algorithms::CanDeletePumpingStationFrom0(graph, "PS_2");
+
+    for (auto r1:res1)
+    {
+        for (auto r2:res2)
+        {
+            if (r1.cityCode==r2.cityCode)
+            {
+                std::cout<<"Difference found: "<<r1.cityCode<<", brute force: "<<r2.waterLoss<<", optimized: "<<r1.waterLoss<<"\n";
+            }
+        }
+    }
 
     return 1;
 
