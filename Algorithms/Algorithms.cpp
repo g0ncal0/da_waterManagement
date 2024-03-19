@@ -3,8 +3,29 @@
 //
 
 #include "Algorithms.h"
+#include <algorithm>
+#include <unordered_map>
+#include <cmath>
+using namespace std;
 
 using namespace std;
+
+
+/**
+ * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities.
+ * @param g graph
+ */
+void Algorithms::calculateWaterInCities(Graph* g){
+    for(Vertex* v: g->getVertexSet()){
+        if(v->getType() == 'c'){
+            City* c = (City*) v;
+            c->setTotalWaterIn(0);
+            for(Edge* in : c->getIncoming()){
+                c->setTotalWaterIn(c->getTotalWaterIn() + in->getFlow());
+            }
+        }
+    }
+}
 
 void Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g)
 {
@@ -120,7 +141,10 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
             auto* reservoir = dynamic_cast<Reservoir*>(v);
             g->addEdge("Source", v->getCode(), reservoir->getDelivery());
         }
-        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) g->addEdge(v->getCode(), "Sink", INT_MAX);
+        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) {
+            auto* city = dynamic_cast<City*>(v);
+            g->addEdge(v->getCode(), "Sink", city->getDemand());
+        }
 
         else if (v->getCode() == "Source") {
             v->setVisited(true);
@@ -140,10 +164,14 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
     g->removeVertex(source);
     g->removeVertex(sink);
 
+
+
+    // Added the calculus of the incoming water in cities.
+    calculateWaterInCities(g);
+
     for (Vertex* v : g->getVertexSet()) {
         if (v->getType() == 'r') {
             v->setPath(nullptr);
-            v->clearIncoming();
         }
     }
 }
@@ -201,8 +229,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
 
     std::vector<CityWaterLoss> wl;
 
-
-
     //temporary algorithm, that must run edmonds-karp every time
     Graph* copy= graph->clone();
     for (const auto& reservoirCode:reservoirCodes) {
@@ -210,20 +236,14 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
     }
     simpleEdmondsKarp(copy);
 
+
+    calculateWaterInCities(copy); // this calculates the water in
+
     for (Vertex* vert:copy->getVertexSet())
     {
         if (vert->getType()=='c')
         {
             City* city = (City*)vert;
-
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getAdj())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
 
             City *originalCity=(City*)graph->findVertex(city->getCode());
 
@@ -249,29 +269,74 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
     // Calculate avg (with sum of differences) and maxdifference
     for(Vertex* vertex : g->getVertexSet()){
         for(Edge* edge : vertex->getAdj()){
-            int difference = edge->getCapacity() - edge->getFlow();
-            sum += difference;
-            sumforvariance += difference * difference;
-            howmany++;
-            if(difference > maxdifference){
-                maxdifference = difference;
+            if(edge->getFlow() >= 0){
+                // we guarantee that the edges we are analysing are the originals and not the "reverse"
+                int difference = edge->getCapacity() - edge->getFlow();
+                sum += difference;
+                sumforvariance += difference * difference;
+                howmany++;
+                if(difference > maxdifference){
+                    maxdifference = difference;
+                }
             }
         }
     }
     GlobalStatisticsEdges res;
 
     res.avg = (float) sum / (float) howmany;
-    res.variance = ((float) sumforvariance - (float) howmany * res.avg) / (float) (howmany - 1); // FORMULA TO CALCULATE VARIANCE FROM M.E. (Course at LEIC).
+    res.variance = ((float) sumforvariance - (float) howmany * (res.avg * res.avg)) / (float) (howmany - 1); // FORMULA TO CALCULATE VARIANCE FROM M.E. (Course at LEIC).
     res.max_difference = maxdifference;
     res.n_edges = howmany;
     return res;
 }
 
 
+int updatepathtoreservoir(Graph* g, Vertex* c, int excess){
+    // iterate over the adj of the current vertex
+    // if is a reservoir, reduce the amount of water he gives out by excess and return true;
+    // if is city return false
+    // divide by all the incoming
+    // if return is true, continue on the remaining edges.
+    // but, cycle through all adj until excess = 0
+    //
+    if(c->getType() == 'c'){
+        // we are not updating here. water doesn't come from cities
+        return 0;
+    }
 
-std::vector<std::pair<Edge*, float>> Algorithms::BalanceTheLoad(Graph* g){
+    if(c->getType() == 'r'){
+        // its a reservatoir. Check if we can remove that amount of water.
+        Reservoir* r = (Reservoir*) c;
+        if(r->getDelivery() > excess){
+            return excess;
+        }
+        return 0;
+    }
+    int tries = c->getAdj().size();
+
+    int sum = 0;
+    while(excess > 0 && tries > 0){
+        for(Edge* edge : c->getIncoming()){
+            // we will try for each edge and see how much flow we can reduce. If not possible, continue
+            int howmuch = std::min(excess, (int)(edge->getFlow() * 0.4)) ; // we will try to remove 40% of the flow each time or the excess
+            if(edge->getFlow() > howmuch && howmuch > 0){
+                int i = updatepathtoreservoir(g, edge->getOrig(), howmuch);
+                excess -= i;
+                edge->setFlow(edge->getFlow() - i);
+                sum +=i;
+                }
+            }
+        }
+        tries--;
+    return sum;
+}
+
+
+
+void Algorithms::BalanceTheLoad(Graph* g){
     // THere is an easy way: to just do the Edmond Karp with the edge from city to sink having a capacity given by the city's need.
     // There is the hard way: to go to each city that has too much water, remove the excess and update the edges until finding a reservoir
+    Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
     /*
@@ -289,11 +354,26 @@ std::vector<std::pair<Edge*, float>> Algorithms::BalanceTheLoad(Graph* g){
      *
      * calculate statistics again
      * */
-    return {{nullptr, 1.0}};
+    for(Vertex* vertex : g->getVertexSet()){
+        if(vertex->getType() == 'c'){
+            City* city = (City*) vertex;
+            int excess = city->getTotalWaterIn() - city->getDemand();
+            int removed = 0;
+            for(Edge* edge : city->getIncoming()){
+                int howmuch = std::min(excess, (int)(0.4 * edge->getFlow()));
+                if(howmuch > 0){
+                    int r = updatepathtoreservoir(g, edge->getOrig(), excess); // understand the max amount of water we have reduced (based on capacity)
+                    edge->setFlow(edge->getFlow() - r);
+                    removed += r;
+                    excess-= r;
+                }
+            }
+        }
+    }
+    Menu::print("The end statistics");
+    GlobalStatisticsEdges endstats = calculatestatistics(g);
+    Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
 }
-
-
-
 
 
 
@@ -304,29 +384,15 @@ std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
 {
     std::vector<City*> cities;
 
-
-
     for (Vertex* vert:graph->getVertexSet())
     {
         if (vert->getType()=='c')
         {
             City* city = (City*)vert;
-
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getIncoming())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
-
-
-            if(city->getTotalWaterIn()<city->getDemand())
+            if(city->getTotalWaterIn() < city->getDemand())
             {
                 cities.push_back(city);
             }
-
         }
 
     }
@@ -389,8 +455,6 @@ std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, c
 }
 
 
-#include <cmath>
-using namespace std;
 
 std::vector<WaterLossOnStationDelete> Algorithms::GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph)
 {
@@ -543,8 +607,13 @@ std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedS
 
 }
 
+<<<<<<< HEAD
 //TODO: this is failing, check why
 void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
+=======
+
+std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode)
+>>>>>>> 5459caea2ccc0bec2dcdf1059e5203faeb31a0a1
 {
 
     queue<Vertex*> q;
@@ -727,6 +796,7 @@ void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do in
     }
 
 
+<<<<<<< HEAD
 }
 
 
@@ -773,6 +843,10 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
   //  graph->removeVertex(source);
   //  graph->removeVertex(sink);
+=======
+    graph->removeVertex(source);
+    graph->removeVertex(sink);
+>>>>>>> 5459caea2ccc0bec2dcdf1059e5203faeb31a0a1
 
     for (std::pair<City*, double> pair:originalWaterValue)
     {
@@ -966,6 +1040,7 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* g
 
         }
     }
+<<<<<<< HEAD
 
     Vertex* station= graph->findVertex(stationCode);
     RemoveWaterFromVertexToSink(graph, station);
@@ -1041,3 +1116,16 @@ void Algorithms::AddSourceAndSink(Graph* graph)
     }
 
 }
+=======
+}
+
+
+std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
+    std::vector<WaterLossOnPipeDelete> res;
+    std::unordered_map<City*, double> originalWaterValue;
+
+
+
+    return res;
+}
+>>>>>>> 5459caea2ccc0bec2dcdf1059e5203faeb31a0a1

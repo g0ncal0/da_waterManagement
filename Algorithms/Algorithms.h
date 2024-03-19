@@ -12,16 +12,19 @@
 #include <climits>
 #include <iostream>
 
+// Representa quanto uma cidade ganha ou perde água
 struct CityWaterLoss{
     std::string cityCode;
     double waterLoss;
 };
 
+// Se fossem tirados várias estações ao mesmo tempo, o que aconteceria
 struct WaterLossOnStationDelete{
     std::vector<std::string> deletedStationsCodes;
     std::vector<CityWaterLoss> waterLoss;
 };
 
+// Representar estatísticas
 struct GlobalStatisticsEdges{
     float avg;
     float variance;
@@ -31,9 +34,14 @@ struct GlobalStatisticsEdges{
 
 typedef std::pair<std::string,std::string>PipeStartEndCodes; // Start Code, End Code of Pipe
 
-
+// Se for removido pipes, qual a water loss
 struct WaterLossOnPipeDelete{
     std::vector<PipeStartEndCodes> deletedPipesCodes;
+    std::vector<CityWaterLoss> waterLoss;
+};
+
+struct WaterLossOnPipeline {
+    std::string pipe;
     std::vector<CityWaterLoss> waterLoss;
 };
 
@@ -43,6 +51,7 @@ struct WaterLossOnPipeDelete{
 
 class Algorithms {
 public:
+    static void calculateWaterInCities(Graph* g);
    //1
     static bool BFSEdmondsKarp(Graph* g, std::queue<Vertex*> q);
     static void simpleEdmondsKarp(Graph *g);
@@ -51,7 +60,7 @@ public:
     static std::vector<City*> CitiesWithNotEnoughWater(Graph* g);
     //3
     // Store on pair (Pipe, float) for each pipe the percentage of decrease/increase that it had after balance
-    static std::vector<std::pair<Edge*, float>> BalanceTheLoad(Graph* g);
+    static void BalanceTheLoad(Graph* g);
 
     //4
     //returns affected cities
@@ -70,6 +79,7 @@ public:
      //6)
     //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);
     static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
+    static std::vector<WaterLossOnPipeDelete> criticalPipelines(Graph* graph);
 
     //extra/helper:
     static void SetWaterIn(Graph* g);

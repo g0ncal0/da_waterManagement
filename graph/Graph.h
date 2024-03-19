@@ -63,6 +63,7 @@ public:
     bool addOutgoingEdge(Edge* edge);
     bool addIncomingEdge(Edge* edge);
     bool removeEdgeTo(Vertex *d);
+    bool removeEdgeIn(Vertex *d);
     bool deleteEdgeTo(Vertex *d);
 
     bool isVisited() const;

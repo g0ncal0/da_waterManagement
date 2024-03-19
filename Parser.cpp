@@ -66,6 +66,7 @@ Graph* Parser::parse(const std::string& reservoirFilePath, const std::string& st
             getLong(reservoirData,id);
             getUntilComma(reservoirData,code);
             getLong(reservoirData,maxDelivery);
+
             if (name!=""&&municipality!=""&&code!="")
             {
                 graph->addReservoir(name,municipality,id,code,maxDelivery);
@@ -93,7 +94,7 @@ Graph* Parser::parse(const std::string& reservoirFilePath, const std::string& st
             int id;
 
             getInt(stationData,id);
-            getUntilComma(stationData,code);
+            getUntilComma(stationData,code, '\r');
             if (code!="")
             {
                 graph->addStation(id,code);
@@ -116,7 +117,7 @@ Graph* Parser::parse(const std::string& reservoirFilePath, const std::string& st
 
 
             string name,code;
-            int id; long population = 0;
+            int id; int population = 0;
             double demand;
 
             getUntilComma(cityData,name,',');
@@ -124,19 +125,7 @@ Graph* Parser::parse(const std::string& reservoirFilePath, const std::string& st
             getUntilComma(cityData,code, ',');
             getDouble(cityData,demand);
             cityData.ignore(1);
-            std::string helper,helper2;
-            getUntilComma(cityData, helper,'\"');
-            for (char c: helper) {
-                if (c!=',')
-                {
-                    helper2 += c;
-                }
-            }
-            if (helper2!="")
-            {
-                population = stol(helper2);
-
-            }
+            getInt(cityData, population, '\"');
 
             if (code!=""&&name!="")
             {

@@ -6,20 +6,7 @@
 using namespace std;
 
 int main() {
-    //  Menu::print("hello");
-    //
-    Graph *graph;
-try {
-    Parser p;
-    graph = p.parse("../data/Small/Reservoirs_Madeira.csv",
-                           "../data/Small/Stations_Madeira.csv",
-                           "../data/Small/Cities_Madeira.csv",
-                           "../data/Small/Pipes_Madeira.csv");
-}   catch (std::exception& e)
-    {
-        std::cout<<"init error: "<<e.what()<< "\n";
-        return 1;
-    }
+
 /*
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     auto res1= Algorithms::CanShutDownReservoirOptimized(graph,"R_3");
@@ -39,7 +26,7 @@ try {
             }
         }
     }
-*/
+
 
     Algorithms::AddSourceAndSink(graph);
 
@@ -64,6 +51,28 @@ try {
     }
 
     return 1;
+*/
+    int m = Menu::getNumber("Choose model to work on. MADEIRA: 0; PT: 1");
+    Graph *graph;
+    try {
+        Parser p;
+        if(m == 0){
+            graph = p.parse("../data/Small/Reservoirs_Madeira.csv",
+                            "../data/Small/Stations_Madeira.csv",
+                            "../data/Small/Cities_Madeira.csv",
+                            "../data/Small/Pipes_Madeira.csv");
+        }else{
+            graph = p.parse("../data/Large/Reservoirs.csv",
+                            "../data/Large/Stations.csv",
+                            "../data/Large/Cities.csv",
+                            "../data/Large/Pipes.csv");
+        }
+    }catch (std::exception& e){
+        std::cout<<"init error: "<<e.what()<< "\n";
+        return 1;
+    }
+
+
 
     Menu::print("Welcome to the Water Management Program.");
     Menu::displayoptions();
@@ -88,8 +97,9 @@ try {
             case 4:
                 Algorithms::BalanceTheLoad(graph);
                 break;
-
-
+            case 9:
+                Menu::printEdges(graph, Menu::getInput("Do you want to choose a specific origin? Insert the code of origin or NULL."));
+                break;
             default:
                 c = false;
                 break;
