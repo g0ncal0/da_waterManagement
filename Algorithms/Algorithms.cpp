@@ -135,7 +135,10 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
             auto* reservoir = dynamic_cast<Reservoir*>(v);
             g->addEdge("Source", v->getCode(), reservoir->getDelivery());
         }
-        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) g->addEdge(v->getCode(), "Sink", INT_MAX);
+        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) {
+            auto* city = dynamic_cast<City*>(v);
+            g->addEdge(v->getCode(), "Sink", city->getDemand());
+        }
 
         else if (v->getCode() == "Source") {
             v->setVisited(true);
