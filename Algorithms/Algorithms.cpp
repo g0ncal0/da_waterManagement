@@ -843,10 +843,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
   //  graph->removeVertex(source);
   //  graph->removeVertex(sink);
-=======
-    graph->removeVertex(source);
-    graph->removeVertex(sink);
->>>>>>> 5459caea2ccc0bec2dcdf1059e5203faeb31a0a1
 
     for (std::pair<City*, double> pair:originalWaterValue)
     {
@@ -981,6 +977,7 @@ void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vertex)
 
 }
 
+//TODO: this doesn't work
 std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode)
 {
     std::vector<CityWaterLoss> cityWaterLoss;
