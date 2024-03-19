@@ -4,7 +4,9 @@
 
 #include "Algorithms.h"
 #include <algorithm>
-
+#include <unordered_map>
+#include <cmath>
+using namespace std;
 
 using namespace std;
 
@@ -24,6 +26,49 @@ void Algorithms::calculateWaterInCities(Graph* g){
         }
     }
 }
+
+void Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g)
+{
+    // Creation of SuperSource and SuperSink
+    string name = "SuperSource";
+    string code = "Source";
+    g->addReservoir(name,name,0,code,INT_MAX);
+
+    name = "SuperSink";
+    code = "Sink";
+    g->addCity(name, 0, code, 0, 0);
+
+    queue<Vertex*> q;
+    Vertex* source;
+    Vertex* sink;
+    // Add edges from supersource to sources and sink to supersink + store in q the supersource for bfs
+    for (Vertex* v : g->getVertexSet()) {
+        v->setVisited(false);
+        for (Edge* edge : v->getAdj()) edge->setFlow(0);
+
+        if ((v->getType() == 'r') && (v->getCode() != "Source")) {
+            auto* reservoir = dynamic_cast<Reservoir*>(v);
+            g->addEdge("Source", v->getCode(), reservoir->getDelivery());
+        }
+        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) g->addEdge(v->getCode(), "Sink", INT_MAX);
+
+        else if (v->getCode() == "Source") {
+            v->setVisited(true);
+            q.push(v);
+            source = v;
+        }
+
+        else if (v->getCode() == "Sink") sink = v;
+    }
+
+    while (BFSEdmondsKarp(g, q)) {
+        // Re-Initialize everything
+        for (Vertex* v : g->getVertexSet()) v->setVisited(false);
+        source->setVisited(true);
+    }
+
+}
+
 
 bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     while (!q.empty()) {
@@ -111,7 +156,10 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
             auto* reservoir = dynamic_cast<Reservoir*>(v);
             g->addEdge("Source", v->getCode(), reservoir->getDelivery());
         }
-        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) g->addEdge(v->getCode(), "Sink", INT_MAX);
+        else if ((v->getType() == 'c') && (v->getCode() != "Sink")) {
+            auto* city = dynamic_cast<City*>(v);
+            g->addEdge(v->getCode(), "Sink", city->getDemand());
+        }
 
         else if (v->getCode() == "Source") {
             v->setVisited(true);
@@ -348,12 +396,9 @@ void Algorithms::BalanceTheLoad(Graph* g){
 
 
 
-
-// TODO: NEEDS REVIEW
 std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
 {
     std::vector<City*> cities;
-
 
     for (Vertex* vert:graph->getVertexSet())
     {
@@ -426,8 +471,6 @@ std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, c
 }
 
 
-#include <cmath>
-using namespace std;
 
 std::vector<WaterLossOnStationDelete> Algorithms::GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph)
 {
@@ -579,3 +622,237 @@ std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedS
     return wl;
 
 }
+
+
+std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode)
+{
+    std::vector<CityWaterLoss> cityWaterLoss;
+
+    std::unordered_map<City*, double> originalWaterValue; //TODO: use this to populate the above vector later.
+
+
+    for (Vertex* vertex:graph->getVertexSet()) {
+        if(vertex->getType()=='c'&&vertex->getCode()!="Sink")
+        {
+            double waterIn=0;
+            for (Edge* edge:vertex->getIncoming()) {
+                waterIn+=edge->getFlow();
+            }
+
+
+            originalWaterValue.emplace((City*)vertex,waterIn);
+
+        }
+    }
+
+    Vertex* reservoir=graph->findVertex(reservoirCode);
+
+
+//assumes it has already got all the info, including source and sink nodes, in it.
+
+    queue<Vertex*> q;
+    Vertex* source=graph->findVertex("Source");
+    Vertex* sink=graph->findVertex("Sink");
+
+
+double waterToRemove=0;
+    for (Edge* edge:reservoir->getAdj()) {
+            waterToRemove+=edge->getFlow();
+    }
+
+//TODO: pôr em diferentes funções
+
+reservoir->setPath(nullptr);
+q.push(reservoir);
+
+    bool run = true;
+//This loop is something similar to the Edmonds-Karp algorithm. It detects paths from the reservoir to the sink that have flow going through them. It removes that flow until there is no flow coming from the reservoir.
+
+    while (run&&waterToRemove>0) {
+        // Re-Initialize everything
+        for (Vertex* v : graph->getVertexSet()) v->setVisited(false);
+        reservoir->setVisited(true);
+        q.push(reservoir);
+        run=false;
+        while (!q.empty()) {
+            Vertex *v = q.front();
+            q.pop();
+            bool contnue = true;
+
+            if (v->getCode() == "Sink") {
+                int minFlow = INT_MAX; //should be double
+                Vertex *vertex = v;
+                Edge *edge = v->getPath();
+
+                //this is the part that needs to change
+                while (edge != nullptr) {
+                    if (vertex == edge->getDest()) {
+                        if ((edge->getFlow()) < minFlow)
+                        { minFlow = edge->getFlow();}
+                        vertex = edge->getOrig();
+                    }
+
+                    edge = vertex->getPath();
+                }
+
+                minFlow= std::min((double)minFlow,(waterToRemove));
+                waterToRemove-=minFlow;
+
+                vertex = v;
+                edge = v->getPath();
+
+                while (edge != nullptr)
+                {
+                    if (vertex == edge->getDest()) {
+                        edge->setFlow(edge->getFlow() - minFlow);
+                        vertex = edge->getOrig();
+                    }
+
+                    edge = vertex->getPath();
+                }
+
+                run = true;
+                contnue = false;
+                q={}; //Maybe remove
+            }
+
+            if (contnue) {
+                for (Edge *edge: v->getAdj()) {
+                    if ((!edge->getDest()->isVisited()) && (edge->getFlow() >0)) {
+                        edge->getDest()->setPath(edge);
+                        edge->getDest()->setVisited(true);
+                        q.push(edge->getDest());
+                    }
+                }
+
+                /*
+                for (Edge *edge: v->getIncoming()) {
+                    if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 0)) {
+                        edge->getOrig()->setPath(edge);
+                        edge->getOrig()->setVisited(true);
+                        q.push(edge->getOrig());
+                    }
+                }
+             */
+
+            }
+        }
+
+
+    }
+
+
+
+
+    //This is a simple edmonds-karp algorithm, except that the reservoir is being ignored.
+    q.push(source);
+    run = true;
+
+    while (run) {
+        // Re-Initialize everything
+        for (Vertex* v : graph->getVertexSet()) {v->setVisited(false);}
+        source->setVisited(true);
+        run=false;
+        while (!q.empty()) {
+            Vertex *v = q.front();
+            q.pop();
+            bool contnue = true;
+
+            if (v->getCode() == "Sink") {
+                int minFlow = INT_MAX; //should be double
+                Vertex *vertex = v;
+                Edge *edge = v->getPath();
+
+
+                while (edge != nullptr) {
+                    if (vertex == edge->getDest()) {
+                        if ((edge->getCapacity() - edge->getFlow()) < minFlow)
+                        { minFlow = edge->getCapacity() -edge->getFlow();}
+                        vertex = edge->getOrig();
+                    } else {
+                        if (edge->getFlow() < minFlow)
+                        {minFlow = edge->getFlow();}
+                        vertex = edge->getDest();
+                    }
+
+                    edge = vertex->getPath();
+                }
+
+                vertex = v;
+                edge = v->getPath();
+
+                while (edge != nullptr) {
+                    if (vertex == edge->getDest()) {
+                        edge->setFlow(edge->getFlow() + minFlow);
+                        vertex = edge->getOrig();
+                    } else {
+                        edge->setFlow(edge->getFlow() - minFlow);
+                        vertex = edge->getDest();
+                    }
+
+                    edge = vertex->getPath();
+                }
+
+                run = true;
+                contnue = false;
+            }
+
+            if (contnue) {
+
+                for (Edge *edge: v->getAdj()) {
+                    if(edge->getDest()==reservoir)
+                    {
+                        continue;
+                    }
+                    if ((!edge->getDest()->isVisited()) && (edge->getFlow() < edge->getCapacity())) {
+                        edge->getDest()->setPath(edge);
+                        edge->getDest()->setVisited(true);
+                        q.push(edge->getDest());
+                    }
+                }
+
+                for (Edge *edge: v->getIncoming()) {
+                    if(edge->getOrig()==reservoir)
+                    {
+                        continue;
+                    }
+                    if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 0)) {
+                        edge->getOrig()->setPath(edge);
+                        edge->getOrig()->setVisited(true);
+                        q.push(edge->getOrig());
+                    }
+                }
+            }
+        }
+
+
+
+
+
+    }
+
+
+    graph->removeVertex(source);
+    graph->removeVertex(sink);
+
+    for (std::pair<City*, double> pair:originalWaterValue)
+    {
+        City* first=pair.first;
+
+        double waterIn=0;
+        for (Edge* edge:first->getIncoming()) {
+            waterIn+=edge->getFlow();
+        }
+
+
+        CityWaterLoss wl;
+        wl.waterLoss= waterIn-pair.second;
+        wl.cityCode=first->getCode();
+        cityWaterLoss.push_back(wl);
+    }
+
+
+    return cityWaterLoss; //this data structure is currently not being populated
+
+}
+
