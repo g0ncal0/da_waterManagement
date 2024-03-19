@@ -607,16 +607,9 @@ std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedS
 
 }
 
-<<<<<<< HEAD
 //TODO: this is failing, check why
 void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
-=======
-
-std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode)
->>>>>>> 5459caea2ccc0bec2dcdf1059e5203faeb31a0a1
-{
-
-    queue<Vertex*> q;
+{   queue<Vertex*> q;
 
     double waterToRemove=0;
     for (Edge* edge:vertex->getAdj()) {
@@ -703,6 +696,7 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
     }
 
 }
+
 void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
 {
     queue<Vertex*> q;
@@ -796,7 +790,6 @@ void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do in
     }
 
 
-<<<<<<< HEAD
 }
 
 
@@ -885,6 +878,9 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
         }
     }
+
+
+
 }
 
 
@@ -1037,7 +1033,7 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* g
 
         }
     }
-<<<<<<< HEAD
+
 
     Vertex* station= graph->findVertex(stationCode);
     RemoveWaterFromVertexToSink(graph, station);
@@ -1113,8 +1109,7 @@ void Algorithms::AddSourceAndSink(Graph* graph)
     }
 
 }
-=======
-}
+
 
 
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
@@ -1125,4 +1120,3 @@ std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
 
     return res;
 }
->>>>>>> 5459caea2ccc0bec2dcdf1059e5203faeb31a0a1
