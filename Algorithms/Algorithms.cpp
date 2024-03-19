@@ -3,6 +3,8 @@
 //
 
 #include "Algorithms.h"
+#include <algorithm>
+
 
 using namespace std;
 
@@ -129,18 +131,17 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
     g->removeVertex(source);
     g->removeVertex(sink);
 
-<<<<<<< HEAD
+
 
     // Added the calculus of the incoming water in cities.
     calculateWaterInCities(g);
-=======
+
     for (Vertex* v : g->getVertexSet()) {
         if (v->getType() == 'r') {
             v->setPath(nullptr);
             v->clearIncoming();
         }
     }
->>>>>>> 7f3c908f3e60c4e0978fe3f64a1e2ec2dae27214
 }
 
 
@@ -258,10 +259,52 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
 }
 
 
+int updatepathtoreservoir(Graph* g, Vertex* c, int excess){
+    // iterate over the adj of the current vertex
+    // if is a reservoir, reduce the amount of water he gives out by excess and return true;
+    // if is city return false
+    // divide by all the incoming
+    // if return is true, continue on the remaining edges.
+    // but, cycle through all adj until excess = 0
+    //
+    if(c->getType() == 'c'){
+        // we are not updating here. water doesn't come from cities
+        return 0;
+    }
+
+    if(c->getType() == 'r'){
+        // its a reservatoir. Check if we can remove that amount of water.
+        Reservoir* r = (Reservoir*) c;
+        if(r->getDelivery() > excess){
+            return excess;
+        }
+        return 0;
+    }
+    int tries = c->getAdj().size();
+
+    int sum = 0;
+    while(excess > 0 && tries > 0){
+        for(Edge* edge : c->getIncoming()){
+            // we will try for each edge and see how much flow we can reduce. If not possible, continue
+            int howmuch = std::min(excess, (int)(edge->getFlow() * 0.4)) ; // we will try to remove 40% of the flow each time or the excess
+            if(edge->getFlow() > howmuch && howmuch > 0){
+                int i = updatepathtoreservoir(g, edge->getOrig(), howmuch);
+                excess -= i;
+                edge->setFlow(edge->getFlow() - i);
+                sum +=i;
+                }
+            }
+        }
+        tries--;
+    return sum;
+}
+
+
 
 void Algorithms::BalanceTheLoad(Graph* g){
     // THere is an easy way: to just do the Edmond Karp with the edge from city to sink having a capacity given by the city's need.
     // There is the hard way: to go to each city that has too much water, remove the excess and update the edges until finding a reservoir
+    Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
     /*
@@ -283,13 +326,21 @@ void Algorithms::BalanceTheLoad(Graph* g){
         if(vertex->getType() == 'c'){
             City* city = (City*) vertex;
             int excess = city->getTotalWaterIn() - city->getDemand();
-            if(excess > 0){
-
+            int removed = 0;
+            for(Edge* edge : city->getIncoming()){
+                int howmuch = std::min(excess, (int)(0.4 * edge->getFlow()));
+                if(howmuch > 0){
+                    int r = updatepathtoreservoir(g, edge->getOrig(), excess); // understand the max amount of water we have reduced (based on capacity)
+                    edge->setFlow(edge->getFlow() - r);
+                    removed += r;
+                    excess-= r;
+                }
             }
         }
     }
-
-
+    Menu::print("The end statistics");
+    GlobalStatisticsEdges endstats = calculatestatistics(g);
+    Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
 }
 
 
@@ -298,12 +349,10 @@ void Algorithms::BalanceTheLoad(Graph* g){
 
 
 
-
-
+// TODO: NEEDS REVIEW
 std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
 {
     std::vector<City*> cities;
-
 
 
     for (Vertex* vert:graph->getVertexSet())
@@ -311,22 +360,10 @@ std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
         if (vert->getType()=='c')
         {
             City* city = (City*)vert;
-
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getIncoming())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
-
-
-            if(city->getTotalWaterIn()<city->getDemand())
+            if(city->getTotalWaterIn() < city->getDemand())
             {
                 cities.push_back(city);
             }
-
         }
 
     }

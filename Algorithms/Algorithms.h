@@ -12,16 +12,19 @@
 #include <climits>
 #include <iostream>
 
+// Representa quanto uma cidade ganha ou perde água
 struct CityWaterLoss{
     std::string cityCode;
     double waterLoss;
 };
 
+// Se fossem tirados várias estações ao mesmo tempo, o que aconteceria
 struct WaterLossOnStationDelete{
     std::vector<std::string> deletedStationsCodes;
     std::vector<CityWaterLoss> waterLoss;
 };
 
+// Representar estatísticas
 struct GlobalStatisticsEdges{
     float avg;
     float variance;
@@ -31,7 +34,7 @@ struct GlobalStatisticsEdges{
 
 typedef std::pair<std::string,std::string>PipeStartEndCodes; // Start Code, End Code of Pipe
 
-
+// Se for removido pipes, qual a water loss
 struct WaterLossOnPipeDelete{
     std::vector<PipeStartEndCodes> deletedPipesCodes;
     std::vector<CityWaterLoss> waterLoss;
