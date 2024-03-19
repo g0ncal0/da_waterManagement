@@ -40,6 +40,11 @@ struct WaterLossOnPipeDelete{
     std::vector<CityWaterLoss> waterLoss;
 };
 
+struct WaterLossOnPipeline {
+    std::string pipe;
+    std::vector<CityWaterLoss> waterLoss;
+};
+
 
 
 //Note: Functions assume that all necessary "previous functions" have been called
@@ -72,6 +77,7 @@ public:
      //6)
     //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);
     static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
+    static std::vector<WaterLossOnPipeDelete> criticalPipelines(Graph* graph);
 
     //extra/helper:
     static void SetWaterIn(Graph* g);

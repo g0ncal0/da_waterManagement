@@ -187,7 +187,6 @@ void Algorithms::simpleEdmondsKarp(Graph *g) {
     for (Vertex* v : g->getVertexSet()) {
         if (v->getType() == 'r') {
             v->setPath(nullptr);
-            v->clearIncoming();
         }
     }
 }
@@ -856,3 +855,36 @@ q.push(reservoir);
 
 }
 
+ void Algorithms::SetWaterIn(Graph* graph)
+{
+    for (Vertex* vert:graph->getVertexSet())
+    {
+        if (vert->getType()=='c')
+        {
+            City* city = (City*)vert;
+
+            double waterReceived = 0;
+
+            for (auto incomingEdge:city->getIncoming())
+            {
+                waterReceived+=incomingEdge->getFlow();
+
+            }
+            city->setTotalWaterIn(waterReceived);
+
+
+
+
+        }
+    }
+}
+
+
+std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
+    std::vector<WaterLossOnPipeDelete> res;
+    std::unordered_map<City*, double> originalWaterValue;
+
+
+
+    return res;
+}

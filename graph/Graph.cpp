@@ -347,6 +347,7 @@ void Vertex::removeOutgoingEdges()
 {
     for (Edge* edge:adj)
     {
+        edge->getDest()->removeEdgeIn(this);
         delete edge;
     }
     adj.resize(0);
@@ -361,6 +362,17 @@ bool Vertex::removeEdgeTo(Vertex *d) {
             return true;
         }
     }
+    return false;
+}
+
+bool Vertex::removeEdgeIn(Vertex *d) {
+    for (auto it = incoming.begin(); it != incoming.end(); it++) {
+        if ((*it)->getOrig() == d) {
+            incoming.erase(it);
+            return true;
+        }
+    }
+
     return false;
 }
 
