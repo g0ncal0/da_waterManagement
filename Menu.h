@@ -9,9 +9,13 @@
 #include <iostream>
 #include <vector>
 #include "graph/Graph.h"
+#include <fstream>
+
 
 class Menu {
-    public:
+private:
+public:
+    static std::string getFileName();
     static std::vector<std::string> getOptions();
     static void print(std::string t);
     static void printList(std::vector<std::string> v);
@@ -22,6 +26,7 @@ class Menu {
     static void printInfoCities(Graph* g, std::string city);
     static std::string getInput(std::string text);
     static void printCities(std::vector<City*> v, std::string text = "");
+    static void printEdges(Graph* g, std::string origin);
 
 };
 

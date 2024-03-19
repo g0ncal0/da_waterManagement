@@ -38,7 +38,9 @@ int main() {
             case 4:
                 Algorithms::BalanceTheLoad(graph);
                 break;
-
+            case 9:
+                Menu::printEdges(graph, Menu::getInput("Do you want to choose a specific origin? Insert the code of origin or NULL."));
+                break;
             default:
                 c = false;
                 break;

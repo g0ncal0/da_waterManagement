@@ -1,6 +1,15 @@
 
-- In the future, we may need to handle memory garbage due to Graph creation of vertexes.
 
 - The parser isn't tested. Also, I think I'll need to change some things with the >>, because I'm not skipping the commas in subsequent >> reads for ints, when I think I should.
 
 - Some functions have been implemented as return 0 meaning success. Maybe this isn't consistent with some others...
+
+
+## Questions:
+- What is done? What is not done?
+- Do we have reverse edges everywhere? A city may have a connection to another city?
+    - Did we use cities as a place that can transport water: water comes from left and goes to right, passing the city?
+- Getactualdelivery vs getdelivery?
+- What are the structs used for?
+
+
