@@ -35,8 +35,8 @@ void Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g)
     // Add edges from supersource to sources and sink to supersink + store in q the supersource for bfs
     for (Vertex* v : g->getVertexSet()) {
         v->setVisited(false);
-        v->setPath(0);
-        for (Edge* edge : v->getAdj()) edge->setFlow(0);
+        v->setPath(0); //todo: remove this?
+        for (Edge* edge : v->getAdj()) edge->setFlow(0); //todo: remove this?
 
         if (v->getCode() == "Source") {
             v->setVisited(true);
@@ -183,46 +183,40 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, const 
 {
     std::vector<CityWaterLoss> wl;
 
+    std::unordered_map<City*, int> initialValues;
 
-
-    //temporary algorithm, that must run edmonds-karp every time
-    Graph* copy= graph->clone();
-
-    copy->removeVertex(copy->findVertex(reservoirCode));
-
-    simpleEdmondsKarp(copy);
-
-
-    for (Vertex* vert:copy->getVertexSet())
-    {
-        if (vert->getType()=='c')
+    for (Vertex* vertex:graph->getVertexSet()) {
+        if (vertex->getType()=='c'&&vertex->getCode()!="Sink")
         {
-            City* city = (City*)vert;
+            initialValues.emplace((City*)vertex,((City*)vertex)->getTotalWaterIn());
+        }
+        for (Edge* edge:vertex->getAdj()) {
+            edge->setFlow(0);
+        }
+    }
+ //this isn't setting the flow?
+    EdmondsKarpThatIgnoresVertex(graph,graph->findVertex(reservoirCode));
 
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getAdj())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
-
-            City *originalCity=(City*)graph->findVertex(city->getCode());
-
-            wl.push_back({city->getCode(),city->getTotalWaterIn()-originalCity->getTotalWaterIn()});
+    for(auto& pr:initialValues)
+    {
+        int win=0;
+        for (Edge* edge:pr.first->getIncoming()) {
+            win+=edge->getFlow();
         }
 
+        CityWaterLoss cwl;
+        cwl.cityCode=pr.first->getCode();
+        cwl.waterLoss= win-pr.second;
+        wl.push_back(cwl);
     }
 
-    delete copy;
 
     return wl;
 }
 
 
 
-
+/*
 //assumes that the graph has already been pre-prepared with the results of the edmonds-karp algorithm.
 std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const std::vector<std::string>& reservoirCodes)
 {
@@ -256,7 +250,7 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
 
     return wl;
 }
-
+*/
 
 
 GlobalStatisticsEdges calculatestatistics(Graph* g){
@@ -455,7 +449,7 @@ std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, c
 }
 
 
-
+/*
 std::vector<WaterLossOnStationDelete> Algorithms::GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph)
 {
     std::vector<WaterLossOnStationDelete> wl;
@@ -526,9 +520,9 @@ std::vector<WaterLossOnStationDelete> Algorithms::GetGroupsOfPumpingStationsThat
 
 return wl;
 }
+*/
 
-
-
+/*
 std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph* graph)
 {
     std::vector<WaterLossOnPipeDelete> wl;
@@ -606,6 +600,8 @@ std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedS
     return wl;
 
 }
+
+ */
 
 //TODO: this is failing, check why
 void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
@@ -696,8 +692,8 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
     }
 
 }
-
-void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
+//WRONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
 {
     queue<Vertex*> q;
     bool run=true;
@@ -1119,4 +1115,15 @@ std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
 
 
     return res;
+}
+
+void Algorithms::SetFlowToZero(Graph* graph)
+{
+    for (Vertex* vert:graph->getVertexSet()) {
+        for (Edge* edge:vert->getAdj()) {
+            edge->setFlow(0);
+        }
+
+    }
+
 }
