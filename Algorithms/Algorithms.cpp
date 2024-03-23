@@ -699,15 +699,16 @@ void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and d
     bool run=true;
     Vertex* source=graph->findVertex("Source");
 
-    q.push(source);
     run = true;
 
     while (run) {
         // Re-Initialize everything
         for (Vertex* v : graph->getVertexSet()) {v->setVisited(false);}
         source->setVisited(true);
+        q={};
+        q.push(source);
         run=false;
-        while (!q.empty()) {
+        while (!q.empty()&&!run) {
             Vertex *v = q.front();
             q.pop();
             bool contnue = true;

@@ -48,14 +48,14 @@ int main() {
     {
         for (auto& r2:res2)
         {
-            if (r1.cityCode==r2.cityCode&&r1.waterLoss!=r2.waterLoss)
+            if (r1.cityCode==r2.cityCode)
             {
                 std::cout<<"Difference found: "<<r1.cityCode<<", brute force: "<<r2.waterLoss<<", optimized: "<<r1.waterLoss<<"\n";
             }
         }
     }
 
-std::cout<<"First is done";
+std::cout<<"First is done\n";
 
 
 
