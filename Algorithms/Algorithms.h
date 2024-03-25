@@ -69,23 +69,19 @@ public:
 
 
     static std::vector<CityWaterLoss> CanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
-    static bool DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss);
-    static std::vector<CityWaterLoss> smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
     static std::vector<CityWaterLoss> CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode);
 
     //5)
     static void deletePumpingStation(Graph* g);
-
     static std::vector<CityWaterLoss> CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode);
     static std::vector<CityWaterLoss> CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode);
 
     //6)
     static std::vector<WaterLossOnPipeDelete> criticalPipelines(Graph* graph);
 
-
-
+    protected:
+    static void RemoveSourceAndSink(Graph* g);
     static void AddSourceAndSink(Graph* g);
-
     static void SetFlowToZero(Graph* graph);
     static void EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx);
 };

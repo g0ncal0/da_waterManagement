@@ -333,44 +333,9 @@ std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
 
 
 
-bool Algorithms::DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss) {
-
-    if (!vertex->getIncoming().empty()) return false; //isto é demasiado restritivo acho que dá para melhorar
-
-    for (Edge* edge : vertex->getAdj()) {
-        if (edge->getDest()->getType() == 'c') {
-            // ESTAS LINHAS ERA PORQUE ESTAVA A PENSAR DE MANEIRA DIFERENTE DO QUE A GABRIELA FEZ, QUANDO ISTO FICAR FEITO EU APAGO
-
-            /*auto* city = dynamic_cast<City*>(edge->getDest());
-            int newMax = 0;
-
-            for (Edge* cityEdge : city->getIncoming()) {
-                if (cityEdge != edge) newMax += cityEdge->getCapacity();
-            }
-
-            if (newMax < city->getDemand()) {
-
-            }*/
-
-            for (CityWaterLoss& waterLoss : cityWaterLoss) {
-                if (waterLoss.cityCode == edge->getDest()->getCode()) {
-                    waterLoss.waterLoss += edge->getFlow();
-                    return true;
-                }
-            }
-
-            cityWaterLoss.push_back({edge->getDest()->getCode(), edge->getFlow()});
-        }
-
-        if (!DFSShutDownReservoir(edge->getDest(), cityWaterLoss)) return false;
-    }
-
-    return true;
-}
 
 
 
-//TODO: this is failing, check why
 void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 {   queue<Vertex*> q;
 
@@ -571,11 +536,13 @@ void Algorithms::shutDownReservoir(Graph* graph){
 
     for (auto& r1:res1)
     {
-        re << "Difference found at " << r1.cityCode <<  " : " << r1.waterLoss << "\n";
+        if (r1.waterLoss!=0) {
+            re << "Difference found at " << r1.cityCode << " : " << r1.waterLoss << "\n";
+        }
     }
 
     Menu::print(re.str());
-
+    Algorithms::RemoveSourceAndSink(graph);
 }
 
 #include <unordered_map>
@@ -602,6 +569,16 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
     Vertex* reservoir=graph->findVertex(reservoirCode);
 
+    if (!reservoir)
+    {
+        cout<<"Invalid reservoir";
+        return {};
+    }
+    if (reservoir->getType()!='r')
+    {
+        cout<<"Invalid reservoir";
+        return {};
+    }
 
 //assumes it has already got all the info, including source and sink nodes, in it.
 
@@ -733,7 +710,7 @@ void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vertex)
 
 }
 
-//TODO: this doesn't work
+//This one probably won't be used in the end...
 std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode)
 {
     std::vector<CityWaterLoss> cityWaterLoss;
@@ -778,28 +755,29 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph
 void Algorithms::deletePumpingStation(Graph *graph) {
 
     std::string pumpStation = Menu::getInput("Code of pumping station to remove");
-    //Algorithms::AddSourceAndSink(graph);
+    Algorithms::AddSourceAndSink(graph);
     Algorithms::SetFlowToZero(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph); //all my edmonds-karp are failing, for some reason...
     Algorithms::calculateWaterInCities(graph);
     auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,pumpStation);
-
+/*
     Algorithms::SetFlowToZero(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph);
     auto res4 = Algorithms::CanDeletePumpingStationFrom0(graph, pumpStation);
-
+*/
     //at least I know that it isn't related to the order in which the algorithms are called. It's really a problem with the ignore vertex function...
     std::stringstream stream;
     for (auto& r1:res3) {
-        for (auto &r2: res4) {
-            if (r1.cityCode == r2.cityCode) {
-                stream << "Difference found: " << r1.cityCode << ", brute force: " << r2.waterLoss << ", optimized: "
-                          << r1.waterLoss << "\n";
+  //      for (auto &r2: res4) {
+            if (r1.waterLoss != 0) {
+                stream << "Difference found: " << r1.cityCode << ", "<<r1.waterLoss<< "\n";
             }
-        }
+    //    }
     }
     Menu::print(stream.str());
+
+    Algorithms::RemoveSourceAndSink(graph);
 }
 
 
@@ -825,6 +803,18 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* g
 
 
     Vertex* station= graph->findVertex(stationCode);
+    if (!station)
+    {
+        cout<<"Pumping station not found!\n";
+        return {};
+    }
+    if(station->getType()!='s')
+    {
+        cout<<"Vertex wasn't a pumping station";
+        return {};
+    }
+
+
     RemoveWaterFromVertexToSink(graph, station);
     RemoveWaterFromSourcesToVertex(graph,station);
     EdmondsKarpThatIgnoresVertex(graph,station);
@@ -986,4 +976,9 @@ void Algorithms::SetFlowToZero(Graph* graph)
 
     }
 
+}
+void Algorithms::RemoveSourceAndSink(Graph* g)
+{
+    g->removeVertex(g->findVertex("Sink"));
+    g->removeVertex(g->findVertex("Source"));
 }
