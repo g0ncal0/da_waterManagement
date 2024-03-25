@@ -50,6 +50,9 @@ struct WaterLossOnPipeline {
 //Note: Functions assume that all necessary "previous functions" have been called
 
 class Algorithms {
+
+public:
+
 public:
     static void calculateWaterInCities(Graph* g);
    //1
@@ -64,13 +67,17 @@ public:
 
     //4
     //returns affected cities
+
+    static void shutDownReservoir(Graph* graph);
+
+
     static std::vector<CityWaterLoss> CanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
     static bool DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>& cityWaterLoss);
     static std::vector<CityWaterLoss> smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
-  //  static std::vector<CityWaterLoss> CanShutDownReservoirs(Graph* graph, const std::vector<std::string>& reservoirCode);
     static std::vector<CityWaterLoss> CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode);
 
     //5)
+    static void deletePumpingStation(Graph* g);
     //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph* graph);
    // static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph);
     static std::vector<CityWaterLoss> CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode);
@@ -81,8 +88,7 @@ public:
  //   static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
     static std::vector<WaterLossOnPipeDelete> criticalPipelines(Graph* graph);
 
-    //extra/helper:
-    static void SetWaterIn(Graph* g);
+
 
     static void AddSourceAndSink(Graph* g);
 

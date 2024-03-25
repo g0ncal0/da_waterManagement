@@ -1,0 +1,16 @@
+
+std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode) {
+    Vertex* vertexReservoir;
+
+    for (Vertex* vertex : graph->getVertexSet()) {
+        if (vertex->getCode() == reservoirCode) {
+            vertexReservoir = vertex;
+            break;
+        }
+    }
+
+    std::vector<CityWaterLoss> cityWaterLoss;
+    if (DFSShutDownReservoir(vertexReservoir, cityWaterLoss)) return cityWaterLoss;
+
+    else return CanShutDownReservoir(graph, vertexReservoir->getCode());
+}

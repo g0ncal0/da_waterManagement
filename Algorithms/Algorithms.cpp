@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <unordered_map>
 #include <cmath>
+#include <sstream>
+
 using namespace std;
 
 using namespace std;
@@ -118,7 +120,12 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     return false;
 }
 
-
+/***
+ * Normal BFS Edmonds Karp
+ * @param g
+ * @param q
+ * @return
+ */
 void Algorithms::simpleEdmondsKarp(Graph *g) {
     // Creation of SuperSource and SuperSink
     string name = "SuperSource";
@@ -252,7 +259,11 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const
 }
 */
 
-
+/***
+ * Calculate statistics information of the graph - O(E + V)
+ * @param g
+ * @return struct with all statistics of graph
+ */
 GlobalStatisticsEdges calculatestatistics(Graph* g){
     int sum = 0;
     int howmany = 0;
@@ -285,55 +296,12 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
 }
 
 
-int updatepathtoreservoir(Graph* g, Vertex* c, int excess){
-    // iterate over the adj of the current vertex
-    // if is a reservoir, reduce the amount of water he gives out by excess and return true;
-    // if is city return false
-    // divide by all the incoming
-    // if return is true, continue on the remaining edges.
-    // but, cycle through all adj until excess = 0
-    //
-    if(c->getType() == 'c'){
-        // we are not updating here. water doesn't come from cities
-        return 0;
-    }
-
-    if(c->getType() == 'r'){
-        // its a reservatoir. Check if we can remove that amount of water.
-        Reservoir* r = (Reservoir*) c;
-        if(r->getDelivery() > excess){
-            return excess;
-        }
-        return 0;
-    }
-    int tries = c->getAdj().size();
-
-    int sum = 0;
-    while(excess > 0 && tries > 0){
-        for(Edge* edge : c->getIncoming()){
-            // we will try for each edge and see how much flow we can reduce. If not possible, continue
-            int howmuch = std::min(excess, (int)(edge->getFlow() * 0.4)) ; // we will try to remove 40% of the flow each time or the excess
-            if(edge->getFlow() > howmuch && howmuch > 0){
-                int i = updatepathtoreservoir(g, edge->getOrig(), howmuch);
-                excess -= i;
-                edge->setFlow(edge->getFlow() - i);
-                sum +=i;
-                }
-            }
-        }
-        tries--;
-    return sum;
-}
-
-
-
 void Algorithms::BalanceTheLoad(Graph* g){
-    // THere is an easy way: to just do the Edmond Karp with the edge from city to sink having a capacity given by the city's need.
-    // There is the hard way: to go to each city that has too much water, remove the excess and update the edges until finding a reservoir
     Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
-    /*
+    /**
+     * INITIAL IDEA: NO LONGER VIABLE
      * calculate the statistics in the beginning
      * for(all the cities)
      *  if(city capacity > demand)
@@ -347,23 +315,21 @@ void Algorithms::BalanceTheLoad(Graph* g){
      *      until excess <= 0;
      *
      * calculate statistics again
-     * */
-    for(Vertex* vertex : g->getVertexSet()){
-        if(vertex->getType() == 'c'){
-            City* city = (City*) vertex;
-            int excess = city->getTotalWaterIn() - city->getDemand();
-            int removed = 0;
-            for(Edge* edge : city->getIncoming()){
-                int howmuch = std::min(excess, (int)(0.4 * edge->getFlow()));
-                if(howmuch > 0){
-                    int r = updatepathtoreservoir(g, edge->getOrig(), excess); // understand the max amount of water we have reduced (based on capacity)
-                    edge->setFlow(edge->getFlow() - r);
-                    removed += r;
-                    excess-= r;
-                }
-            }
-        }
-    }
+     */
+
+
+
+    /**
+     * New Algorithm:
+     * while(exists an augmenting path){
+     *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
+     *  for each augmenting path find 70% of max flow capacity
+     *  increment a counter on graph edges
+     *
+     *  check if number of cities with enough water is equal to beginning. if it is, stop.
+     *
+     */
+
     Menu::print("The end statistics");
     GlobalStatisticsEdges endstats = calculatestatistics(g);
     Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
@@ -373,7 +339,11 @@ void Algorithms::BalanceTheLoad(Graph* g){
 
 
 
-
+/***
+ * Traverses all cities, checking if amount of water reached is enough. O(n), where n is the number of vertixes of graph
+ * @param graph
+ * @return vector of cities that do not have enough water
+ */
 std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
 {
     std::vector<City*> cities;
@@ -432,176 +402,7 @@ bool Algorithms::DFSShutDownReservoir(Vertex* vertex, std::vector<CityWaterLoss>
     return true;
 }
 
-std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, const std::string& reservoirCode) {
-    Vertex* vertexReservoir;
 
-    for (Vertex* vertex : graph->getVertexSet()) {
-        if (vertex->getCode() == reservoirCode) {
-            vertexReservoir = vertex;
-            break;
-        }
-    }
-
-    std::vector<CityWaterLoss> cityWaterLoss;
-    if (DFSShutDownReservoir(vertexReservoir, cityWaterLoss)) return cityWaterLoss;
-
-    else return CanShutDownReservoir(graph, vertexReservoir->getCode());
-}
-
-
-/*
-std::vector<WaterLossOnStationDelete> Algorithms::GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph)
-{
-    std::vector<WaterLossOnStationDelete> wl;
-
-    std::vector<std::string> pumpingStations;
-    for (Vertex* vert:graph->getVertexSet()) {
-        if(vert->getType()=='s'){
-        pumpingStations.push_back(vert->getCode());
-        }
-    }
-    if(pumpingStations.size()>=64)
-    {
-        std::cout<< "Error: too many stations for the brute force implementation";
-        return wl;
-    }
-
-    for (unsigned long i = 0; i < pow(2,pumpingStations.size()); ++i) {
-        std::vector<std::string> pumpingStationsToRemove;
-        for (unsigned long j = 0; j < pumpingStations.size(); ++j) {
-            unsigned long mask= (1<<j);
-            if(i&mask)
-            {
-                pumpingStationsToRemove.push_back(pumpingStations[j]);
-            }
-
-        }
-
-        std::vector<CityWaterLoss> wl2;
-
-        Graph* copy= graph->clone();
-        for (const auto& code:pumpingStationsToRemove) {
-            copy->removeVertex(copy->findVertex(code));
-        }
-        simpleEdmondsKarp(copy);
-
-        for (Vertex* vert:copy->getVertexSet())
-        {
-            if (vert->getType()=='c')
-            {
-                City* city = (City*)vert;
-
-                double waterReceived = 0;
-
-                for (auto incomingEdge:city->getAdj())
-                {
-                    waterReceived+=incomingEdge->getFlow();
-
-                }
-                city->setTotalWaterIn(waterReceived);
-
-                City *originalCity=(City*)graph->findVertex(city->getCode());
-
-                wl2.push_back({city->getCode(),city->getTotalWaterIn()-originalCity->getTotalWaterIn()});
-            }
-
-        }
-
-        delete copy;
-        WaterLossOnStationDelete loss;
-        loss.deletedStationsCodes=pumpingStationsToRemove;
-        loss.waterLoss=wl2;
-        wl.push_back(loss);
-
-
-    }
-
-
-
-return wl;
-}
-*/
-
-/*
-std::vector<WaterLossOnPipeDelete> Algorithms::GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph* graph)
-{
-    std::vector<WaterLossOnPipeDelete> wl;
-
-
-    std::vector<PipeStartEndCodes> allPipes;
-
-    for (Vertex* vert:graph->getVertexSet()) {
-        for (auto edge:vert->getAdj())
-        {
-            allPipes.push_back({edge->getOrig()->getCode(),edge->getDest()->getCode()});
-        }
-    }
-
-    if(allPipes.size()>=64)
-    {
-        std::cout<< "Error: too many stations for the brute force implementation";
-        return wl;
-    }
-
-    for (unsigned long i = 0; i < pow(2,allPipes.size()); ++i) {
-
-        std::vector<PipeStartEndCodes> deletedPipesCodes;
-        for (unsigned long j = 0; j < allPipes.size(); ++j) {
-            unsigned long mask= (1<<j);
-            if(i&mask)
-            {
-                deletedPipesCodes.push_back(allPipes[j]);
-            }
-
-        }
-
-
-        std::vector<CityWaterLoss> wl2;
-
-        Graph* copy= graph->clone();
-        for (const auto& codes:deletedPipesCodes) {
-            copy->removeEdge(codes.first,codes.second);
-        }
-
-        simpleEdmondsKarp(copy);
-
-        for (Vertex* vert:copy->getVertexSet())
-        {
-            if (vert->getType()=='c')
-            {
-                City* city = (City*)vert;
-
-                double waterReceived = 0;
-
-                for (auto incomingEdge:city->getAdj())
-                {
-                    waterReceived+=incomingEdge->getFlow();
-
-                }
-                city->setTotalWaterIn(waterReceived);
-
-                City *originalCity=(City*)graph->findVertex(city->getCode());
-
-                wl2.push_back({city->getCode(),city->getTotalWaterIn()-originalCity->getTotalWaterIn()});
-            }
-
-        }
-
-        delete copy;
-        WaterLossOnPipeDelete loss;
-        loss.deletedPipesCodes=deletedPipesCodes;
-        loss.waterLoss=wl2;
-        wl.push_back(loss);
-
-
-
-    }
-
-    return wl;
-
-}
-
- */
 
 //TODO: this is failing, check why
 void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
@@ -692,6 +493,7 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
     }
 
 }
+
 //WRONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
 {
@@ -790,6 +592,29 @@ void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and d
 }
 
 
+
+void Algorithms::shutDownReservoir(Graph* graph){
+
+    // Get reservoir
+    std::string reservTOREMOVE = Menu::getInput("Code of reservoir to remove");
+
+    // Do the computation
+    Algorithms::AddSourceAndSink(graph);
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    auto res1= Algorithms::CanShutDownReservoirOptimized(graph,reservTOREMOVE);
+
+    // To display to user
+    std::stringstream re;
+
+    for (auto& r1:res1)
+    {
+        re << "Difference found at " << r1.cityCode <<  " : " << r1.waterLoss << "\n";
+    }
+
+    Menu::print(re.str());
+
+}
+
 #include <unordered_map>
 std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* graph, const std::string& reservoirCode)
 {
@@ -852,31 +677,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
 
 
     return cityWaterLoss;
-
-}
-
- void Algorithms::SetWaterIn(Graph* graph)
-{
-    for (Vertex* vert:graph->getVertexSet())
-    {
-        if (vert->getType()=='c')
-        {
-            City* city = (City*)vert;
-
-            double waterReceived = 0;
-
-            for (auto incomingEdge:city->getIncoming())
-            {
-                waterReceived+=incomingEdge->getFlow();
-
-            }
-            city->setTotalWaterIn(waterReceived);
-
-
-        }
-    }
-
-
 
 }
 
@@ -1012,6 +812,34 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph
 }
 
 
+void Algorithms::deletePumpingStation(Graph *graph) {
+
+    //Algorithms::AddSourceAndSink(graph);
+    Algorithms::SetFlowToZero(graph);
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph); //all my edmonds-karp are failing, for some reason...
+    Algorithms::calculateWaterInCities(graph);
+    auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,"PS_2");
+
+    Algorithms::SetFlowToZero(graph);
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    Algorithms::calculateWaterInCities(graph);
+    auto res4 = Algorithms::CanDeletePumpingStationFrom0(graph, "PS_2");
+
+    //at least I know that it isn't related to the order in which the algorithms are called. It's really a problem with the ignore vertex function...
+    std::stringstream stream;
+    for (auto& r1:res3) {
+        for (auto &r2: res4) {
+            if (r1.cityCode == r2.cityCode) {
+                stream << "Difference found: " << r1.cityCode << ", brute force: " << r2.waterLoss << ", optimized: "
+                          << r1.waterLoss << "\n";
+            }
+        }
+    }
+    Menu::print(stream.str());
+}
+
+
+
 std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode)
 {
     std::vector<CityWaterLoss> cityWaterLoss;
@@ -1112,8 +940,6 @@ void Algorithms::AddSourceAndSink(Graph* graph)
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::vector<WaterLossOnPipeDelete> res;
     std::unordered_map<City*, double> originalWaterValue;
-
-
 
     return res;
 }
