@@ -33,4 +33,5 @@ add_executable(project main.cpp
         graph/Graph.h
         graph/Graph.cpp
         Algorithms/Algorithms.h
-        Algorithms/Algorithms.cpp)
+        Algorithms/Algorithms.cpp
+        Algorithms/BalanceLoad.cpp)
