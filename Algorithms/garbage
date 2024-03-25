@@ -14,3 +14,49 @@ std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, c
 
     else return CanShutDownReservoir(graph, vertexReservoir->getCode());
 }
+
+
+    //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph* graph);
+   // static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph);
+
+
+     //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);
+    //   static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
+
+
+
+    /*
+    //assumes that the graph has already been pre-prepared with the results of the edmonds-karp algorithm.
+    std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const std::vector<std::string>& reservoirCodes)
+    {
+
+        std::vector<CityWaterLoss> wl;
+
+        //temporary algorithm, that must run edmonds-karp every time
+        Graph* copy= graph->clone();
+        for (const auto& reservoirCode:reservoirCodes) {
+            copy->removeVertex(copy->findVertex(reservoirCode));
+        }
+        simpleEdmondsKarp(copy);
+
+
+        calculateWaterInCities(copy); // this calculates the water in
+
+        for (Vertex* vert:copy->getVertexSet())
+        {
+            if (vert->getType()=='c')
+            {
+                City* city = (City*)vert;
+
+                City *originalCity=(City*)graph->findVertex(city->getCode());
+
+                wl.push_back({city->getCode(),city->getTotalWaterIn()-originalCity->getTotalWaterIn()});
+            }
+
+        }
+
+        delete copy;
+
+        return wl;
+    }
+    */

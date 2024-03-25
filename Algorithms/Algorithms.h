@@ -62,12 +62,9 @@ public:
     //2
     static std::vector<City*> CitiesWithNotEnoughWater(Graph* g);
     //3
-    // Store on pair (Pipe, float) for each pipe the percentage of decrease/increase that it had after balance
     static void BalanceTheLoad(Graph* g);
 
     //4
-    //returns affected cities
-
     static void shutDownReservoir(Graph* graph);
 
 
@@ -78,14 +75,11 @@ public:
 
     //5)
     static void deletePumpingStation(Graph* g);
-    //static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafely(Graph* graph);
-   // static std::vector<WaterLossOnStationDelete> GetGroupsOfPumpingStationsThatCanBeRemovedSafelyBruteForce(Graph* graph);
+
     static std::vector<CityWaterLoss> CanDeletePumpingStationOptimized(Graph* graph, const std::string& stationCode);
     static std::vector<CityWaterLoss> CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode);
 
-     //6)
-    //static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafely(Graph*);
- //   static std::vector<WaterLossOnPipeDelete> GetGroupsOfEdgesThatCanBeRemovedSafelyBruteForce(Graph*);
+    //6)
     static std::vector<WaterLossOnPipeDelete> criticalPipelines(Graph* graph);
 
 

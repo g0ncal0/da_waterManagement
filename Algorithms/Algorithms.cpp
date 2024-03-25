@@ -223,41 +223,7 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, const 
 
 
 
-/*
-//assumes that the graph has already been pre-prepared with the results of the edmonds-karp algorithm.
-std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirs(Graph* graph, const std::vector<std::string>& reservoirCodes)
-{
 
-    std::vector<CityWaterLoss> wl;
-
-    //temporary algorithm, that must run edmonds-karp every time
-    Graph* copy= graph->clone();
-    for (const auto& reservoirCode:reservoirCodes) {
-        copy->removeVertex(copy->findVertex(reservoirCode));
-    }
-    simpleEdmondsKarp(copy);
-
-
-    calculateWaterInCities(copy); // this calculates the water in
-
-    for (Vertex* vert:copy->getVertexSet())
-    {
-        if (vert->getType()=='c')
-        {
-            City* city = (City*)vert;
-
-            City *originalCity=(City*)graph->findVertex(city->getCode());
-
-            wl.push_back({city->getCode(),city->getTotalWaterIn()-originalCity->getTotalWaterIn()});
-        }
-
-    }
-
-    delete copy;
-
-    return wl;
-}
-*/
 
 /***
  * Calculate statistics information of the graph - O(E + V)
@@ -583,9 +549,6 @@ void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and d
         }
 
 
-
-
-
     }
 
 
@@ -814,16 +777,17 @@ std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph
 
 void Algorithms::deletePumpingStation(Graph *graph) {
 
+    std::string pumpStation = Menu::getInput("Code of pumping station to remove");
     //Algorithms::AddSourceAndSink(graph);
     Algorithms::SetFlowToZero(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph); //all my edmonds-karp are failing, for some reason...
     Algorithms::calculateWaterInCities(graph);
-    auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,"PS_2");
+    auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,pumpStation);
 
     Algorithms::SetFlowToZero(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph);
-    auto res4 = Algorithms::CanDeletePumpingStationFrom0(graph, "PS_2");
+    auto res4 = Algorithms::CanDeletePumpingStationFrom0(graph, pumpStation);
 
     //at least I know that it isn't related to the order in which the algorithms are called. It's really a problem with the ignore vertex function...
     std::stringstream stream;
@@ -937,9 +901,61 @@ void Algorithms::AddSourceAndSink(Graph* graph)
 
 
 
+/***
+ * Computes if any of the edges that is entering the vertex given is critical based on local information
+ * @param vertex
+ * @param required
+ * @param vector the vector which is updated everytime it's found a new critical edge
+ * @return
+ */
+bool checkcritical(Vertex* vertex, int required, vector<vector<Edge*>>* vector){
+    if(vertex->getType() == 'r'){
+        // We are in a reservoir, end!
+        return true;
+    }
+    int sum = 0;
+    int min = INT_MAX;
+    int max = 0;
+
+    for(Edge* edge : vertex->getIncoming()){
+        sum += edge->getCapacity();
+        if(edge->getCapacity() < min){
+            min = edge->getCapacity();
+        }
+        if(edge->getCapacity() > max){
+            max = edge->getCapacity();
+        }
+    }
+
+    // if max is greater than the required
+    // AND: the sum - max is greater or equal to required
+    // THEN: Everything ok
+    if(max > required){
+        if(sum -max >= required){
+            return true;
+        }
+    }
+
+    // If max is greater than required
+    // AND: the sum - max is lower than required.
+    // Then: we rely on max to give water -> it's critical!!
+
+
+
+    if(sum == required){
+        // they are all critical!
+
+    }
+
+}
+
+
+
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::vector<WaterLossOnPipeDelete> res;
     std::unordered_map<City*, double> originalWaterValue;
+
+
 
     return res;
 }
