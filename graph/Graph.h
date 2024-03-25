@@ -138,11 +138,14 @@ protected:
     Vertex *orig;
     Edge *reverse = nullptr;
 
+
     double flow = 0; // for flow-related problems
 public:
     Edge(Vertex *orig, Vertex *dest, double capacity);
 
-
+    std::string getCode() const{
+        return "PP" + orig->getCode() + dest->getCode();
+    }
     Vertex * getDest() const;
     double getCapacity() const;
     bool isSelected() const;

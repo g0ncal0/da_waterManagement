@@ -60,6 +60,9 @@ int main() {
             case 6:
                 Algorithms::deletePumpingStation(graph);
                 break;
+            case 7:
+                Algorithms::criticalPipelines(graph);
+                break;
             case 9:
                 Menu::printEdges(graph, Menu::getInput("Do you want to choose a specific origin? Insert the code of origin or NULL."));
                 break;

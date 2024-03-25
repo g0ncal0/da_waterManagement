@@ -901,50 +901,39 @@ void Algorithms::AddSourceAndSink(Graph* graph)
 
 
 
+
 /***
  * Computes if any of the edges that is entering the vertex given is critical based on local information
+ * REQUIRES RUNNING EDMONDS KARP BEFORE
  * @param vertex
  * @param required
  * @param vector the vector which is updated everytime it's found a new critical edge
  * @return
  */
-bool checkcritical(Vertex* vertex, int required, vector<vector<Edge*>>* vector){
+void checkcritical(Vertex* vertex, int required, vector<Edge*>* vector){
     if(vertex->getType() == 'r'){
         // We are in a reservoir, end!
-        return true;
+        return;
     }
     int sum = 0;
-    int min = INT_MAX;
-    int max = 0;
 
-    for(Edge* edge : vertex->getIncoming()){
-        sum += edge->getCapacity();
-        if(edge->getCapacity() < min){
-            min = edge->getCapacity();
-        }
-        if(edge->getCapacity() > max){
-            max = edge->getCapacity();
-        }
+    for(Edge* e : vertex->getIncoming()) {
+        sum += e->getCapacity();
     }
 
-    // if max is greater than the required
-    // AND: the sum - max is greater or equal to required
-    // THEN: Everything ok
-    if(max > required){
-        if(sum -max >= required){
-            return true;
+    for(Edge* current : vertex->getIncoming()){
+
+        if(current->getFlow() == 0){
+            // definitely, not critical -> we didn't need it for edmonds karp
+            continue;
         }
-    }
 
-    // If max is greater than required
-    // AND: the sum - max is lower than required.
-    // Then: we rely on max to give water -> it's critical!!
-
-
-
-    if(sum == required){
-        // they are all critical!
-
+        int sumothers = sum - current->getCapacity();
+        if(sumothers < required){
+            // if others can't give everything that is required, then this is critical!!
+            vector->push_back(current);
+            checkcritical(current->getOrig(), required-sumothers,vector);
+        }
     }
 
 }
@@ -956,7 +945,35 @@ std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::unordered_map<City*, double> originalWaterValue;
 
 
+    Menu::print("FOR THIS ALGORITHM, YOU NEED TO HAVE HAD RUN EDMONDS KARP (option 2)!");
+    /**
+     * for all cities:
+     *  check if demands are met
+     *  if so, checkcritical(city, demand, vector),
+     */
 
+
+    // HERE: I MUST UPDATE THE INcOMING edges: so that after it can understand them.
+    // HERE: I must update a attribute max-flow at edge so that i can understand how much a edge can really bring to table if needed
+    // and understand if others are critical
+
+
+    for(Vertex* v : graph->getVertexSet()){
+        if(v->getType() == 'c'){
+            City* city = (City*) v;
+            if(city->getDemand() == city->getTotalWaterIn()){
+                vector<Edge*> result;
+                checkcritical(v, city->getDemand(), &result);
+
+                Menu::print("--- CITY NAME: " + city->getName() + " (" + city->getCode() + ")");
+                std::stringstream edges;
+                for(Edge* e : result){
+                    edges <<  e->getOrig()->getCode() << " to " << e->getDest()->getCode() << " | ";
+                }
+                Menu::print(edges.str());
+            }
+        }
+    }
     return res;
 }
 
