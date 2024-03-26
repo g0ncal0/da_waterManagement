@@ -1,3 +1,4 @@
+/*
 //
 // Created by Filipe Correia on 25/03/2024.
 //
@@ -154,11 +155,13 @@ void balanceEdmondsKarp(Graph *g) {
 
 
 
+*/
 /***
  * Calculate statistics information of the graph - O(E + V)
  * @param g
  * @return struct with all statistics of graph
- */
+ *//*
+
 GlobalStatisticsEdges calculatestatistics(Graph* g){
     int sum = 0;
     int howmany = 0;
@@ -197,7 +200,8 @@ void Algorithms::BalanceTheLoad(Graph* g){
     Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
-    /**
+    */
+/**
      * INITIAL IDEA: NO LONGER VIABLE
      * calculate the statistics in the beginning
      * for(all the cities)
@@ -212,10 +216,12 @@ void Algorithms::BalanceTheLoad(Graph* g){
      *      until excess <= 0;
      *
      * calculate statistics again
-     */
+     *//*
+
     balanceEdmondsKarp(g);
 
     Menu::print("The end statistics");
     GlobalStatisticsEdges endstats = calculatestatistics(g);
     Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
 }
+*/
