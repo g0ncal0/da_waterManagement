@@ -478,7 +478,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
                 waterIn+=edge->getFlow();
             }
 
-
             originalWaterValue.emplace((City*)vertex,waterIn);
 
         }
@@ -847,6 +846,8 @@ void checkcritical(Vertex* vertex, int required, vector<Edge*>* vector){
 
 
 
+
+
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::vector<WaterLossOnPipeDelete> res;
     std::unordered_map<City*, double> originalWaterValue;
@@ -860,7 +861,6 @@ std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
      */
 
 
-    // HERE: I MUST UPDATE THE INcOMING edges: so that after it can understand them.
     // HERE: I must update a attribute max-flow at edge so that i can understand how much a edge can really bring to table if needed
     // and understand if others are critical
 
