@@ -222,6 +222,221 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, const 
 }
 
 
+/***
+ * Calculate statistics information of the graph - O(E + V)
+ * @param g
+ * @return struct with all statistics of graph
+ */
+GlobalStatisticsEdges calculatestatistics(Graph* g){
+    for (Vertex* vertex : g->getVertexSet()) {
+        for (Edge* edge : vertex->getAdj()) {
+            edge->setSelected(false);
+        }
+    }
+
+    int sum = 0;
+    int howmany = 0;
+    int sumforvariance = 0;
+    int maxdifference = 0;
+    // Calculate avg (with sum of differences) and maxdifference
+    for(Vertex* vertex : g->getVertexSet()){
+        for(Edge* edge : vertex->getAdj()){
+            if ((edge->getFlow() == 0) && (edge->getReverse() != nullptr) && (!edge->getReverse()->isSelected())) {
+                edge->setSelected(true);
+                continue;
+            }
+
+            else if (!edge->isSelected()) {
+                edge->setSelected(true);
+                if (edge->getReverse() != nullptr) edge->getReverse()->setSelected(true);
+                // we guarantee that the edges we are analysing are the originals and not the "reverse"
+                int difference = edge->getCapacity() - edge->getFlow();
+                sum += difference;
+                sumforvariance += difference * difference;
+                howmany++;
+                if(difference > maxdifference){
+                    maxdifference = difference;
+                }
+            }
+        }
+    }
+    GlobalStatisticsEdges res;
+
+    res.avg = (float) sum / (float) howmany;
+    res.variance = ((float) sumforvariance - (float) howmany * (res.avg * res.avg)) / (float) (howmany - 1); // FORMULA TO CALCULATE VARIANCE FROM M.E. (Course at LEIC).
+    res.max_difference = maxdifference;
+    res.n_edges = howmany;
+    return res;
+}
+
+
+void Algorithms::BalanceTheLoad(Graph* g){
+    Menu::print("The initial statistics");
+    GlobalStatisticsEdges stats = calculatestatistics(g);
+    Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
+    /**
+     * INITIAL IDEA: NO LONGER VIABLE
+     * calculate the statistics in the beginning
+     * for(all the cities)
+     *  if(city capacity > demand)
+     *      excess = capacity - demand;
+     *      remove that excess from the capacity of the city
+     *      repeat:
+     *        find a path from the city to reservoir
+     *        find the max weight of the path
+     *        remove that weight (max(weight, excess))
+     *        decrease excess by how much it was removed
+     *      until excess <= 0;
+     *
+     * calculate statistics again
+     */
+
+
+
+    /**
+     * New Algorithm:
+     * while(exists an augmenting path){
+     *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
+     *  for each augmenting path find 70% of max flow capacity
+     *  increment a counter on graph edges
+     *
+     *  check if number of cities with enough water is equal to beginning. if it is, stop.
+     *
+     */
+
+    for (Vertex* vertex : g->getVertexSet()) {
+        vertex->setVisited(false);
+        vertex->setPath(nullptr);
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) {
+        vector<Edge*> fullEdges;
+        int edgesWithSpace = 0;
+        int space = 0;
+
+        for (Edge* edge : vertex->getIncoming()) {
+            if (edge->getFlow() == edge->getCapacity()) fullEdges.push_back(edge);
+            else {
+                edgesWithSpace++;
+                space += edge->getCapacity() - edge->getFlow();
+            }
+        }
+
+        if (fullEdges.empty()) continue;
+        space /= 2;
+        space /= (int)fullEdges.size();
+
+        for (Edge* edge : fullEdges) {
+            int maxFlow = space;
+            int improved = 0;
+            queue<Vertex*> q;
+            Vertex* source = edge->getOrig();
+            q.push(source);
+            source->setVisited(true);
+
+            while (auxBFSBalanceTheLoad(g, q, source->getCode(), vertex->getCode(), maxFlow)) {
+                // Re-Initialize everything
+                for (Vertex* v : g->getVertexSet()) v->setVisited(false);
+
+                improved += maxFlow;
+                edge->setFlow(edge->getFlow() - maxFlow);
+                if ((improved == space) || (maxFlow == 0)) break;
+                maxFlow = space - improved;
+
+                source->setVisited(true);
+                source->setPath(nullptr);
+            }
+        }
+    }
+
+
+    Menu::print("The end statistics");
+    GlobalStatisticsEdges endstats = calculatestatistics(g);
+    Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
+}
+
+
+bool Algorithms::auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std::string& source, const std::string& sink, int& maxFlow) {
+    while (!q.empty()) {
+        Vertex* v = q.front();
+        q.pop();
+
+        if (v->getCode() == sink) {
+            int minFlow = maxFlow;
+            Vertex* vertex = v;
+            Edge* edge = v->getPath();
+
+            while (edge != nullptr) {
+                if (vertex == edge->getDest()) {
+                    if ((edge->getCapacity() - edge->getFlow()) < minFlow) minFlow = edge->getCapacity() - edge->getFlow();
+                    vertex = edge->getOrig();
+                }
+
+                else {
+                    if (edge->getFlow() < minFlow) minFlow = edge->getFlow();
+                    vertex = edge->getDest();
+                }
+
+                if (vertex->getCode() == source) break;
+
+                edge = vertex->getPath();
+            }
+
+            vertex = v;
+            edge = v->getPath();
+            maxFlow = minFlow;
+
+            while (edge != nullptr) {
+                if (vertex == edge->getDest()) {
+                    if ((edge->getFlow() == 0) && (edge->getReverse() != nullptr) && (edge->getReverse()->getFlow() > 0)) {
+                        edge->getReverse()->setFlow(edge->getReverse()->getFlow() - minFlow);
+                    }
+
+                    else {
+                        edge->setFlow(edge->getFlow() + minFlow);
+                    }
+
+                    vertex = edge->getOrig();
+                }
+                else {
+                    if ((edge->getFlow() == 0) && (edge->getReverse() != nullptr) && (edge->getReverse()->getFlow() > 0)) {
+                        edge->getReverse()->setFlow(edge->getReverse()->getFlow() + minFlow);
+                    }
+
+                    else {
+                        edge->setFlow(edge->getFlow() - minFlow);
+                    }
+
+                    vertex = edge->getDest();
+                }
+
+                if (vertex->getCode() == source) break;
+
+                edge = vertex->getPath();
+            }
+
+            return true;
+        }
+
+        for (Edge* edge : v->getAdj()) {
+            if ((!edge->getDest()->isVisited()) && (edge->getFlow() < edge->getCapacity())) {
+                edge->getDest()->setPath(edge);
+                edge->getDest()->setVisited(true);
+                q.push(edge->getDest());
+            }
+        }
+
+        for (Edge* edge : v->getIncoming()) {
+            if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 0)) {
+                edge->getOrig()->setPath(edge);
+                edge->getOrig()->setVisited(true);
+                q.push(edge->getOrig());
+            }
+        }
+    }
+
+    return false;
+}
 
 
 /***

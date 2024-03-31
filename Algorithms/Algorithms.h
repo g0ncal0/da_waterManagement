@@ -15,7 +15,7 @@
 // Representa quanto uma cidade ganha ou perde água
 struct CityWaterLoss{
     std::string cityCode;
-    double waterLoss;
+    int waterLoss;
 };
 
 // Se fossem tirados várias estações ao mesmo tempo, o que aconteceria
@@ -63,6 +63,7 @@ public:
     static std::vector<City*> CitiesWithNotEnoughWater(Graph* g);
     //3
     static void BalanceTheLoad(Graph* g);
+    static bool auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std::string& source, const std::string& sink, int& maxFlow);
 
     //4
     static void shutDownReservoir(Graph* graph);

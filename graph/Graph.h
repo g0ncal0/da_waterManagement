@@ -111,7 +111,7 @@ private:
     int id;
     int demand;
     int population;
-    double totalWaterIn;
+    double totalWaterIn = 0;
 public:
     City(const std::string &name, int id, const std::string &code, int demand, int population);
     //City();
