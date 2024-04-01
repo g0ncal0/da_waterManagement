@@ -100,4 +100,19 @@ std::vector<CityWaterLoss> Algorithms::smartCanShutDownReservoir(Graph* graph, c
 
         return wl;
     }
+
+
+
+
+
+    /* Algorithms::deletePumpingStation(Graph *graph) Também funciona, mas dá resultados alternativos/diferentes mas igualmente válidos...
+        Algorithms::SetFlowToZero(graph);
+        Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+        Algorithms::calculateWaterInCities(graph);
+        auto res4 = Algorithms::CanDeletePumpingStationFrom0(graph, pumpStation);
+    */
+
+
+
+
     */
