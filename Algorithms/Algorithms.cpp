@@ -14,7 +14,7 @@ using namespace std;
 
 
 /**
- * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities.
+ * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities. O(N)
  * @param g graph
  */
 void Algorithms::calculateWaterInCities(Graph* g){
@@ -1062,7 +1062,11 @@ void checkcritical(Vertex* vertex, int required, vector<Edge*>* vector){
 
 
 
-
+/***
+ * Check critical pipelines by city. Uses a recursive algorithm that finds pipes that are likely to be critical. O(V * (V + E)).
+ * @param graph
+ * @return
+ */
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::vector<WaterLossOnPipeDelete> res;
     std::unordered_map<City*, double> originalWaterValue;
