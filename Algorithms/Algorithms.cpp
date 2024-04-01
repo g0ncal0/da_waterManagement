@@ -892,12 +892,13 @@ void Algorithms::deletePumpingStation(Graph *graph) {
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph); //all my edmonds-karp are failing, for some reason...
     Algorithms::calculateWaterInCities(graph);
     auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,pumpStation);
-/*
+/* Também funciona, mas dá resultados alternativos/diferentes mas igualmente válidos...
     Algorithms::SetFlowToZero(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph);
     auto res4 = Algorithms::CanDeletePumpingStationFrom0(graph, pumpStation);
 */
+
     //at least I know that it isn't related to the order in which the algorithms are called. It's really a problem with the ignore vertex function...
     std::stringstream stream;
     for (auto& r1:res3) {
