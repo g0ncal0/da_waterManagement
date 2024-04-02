@@ -80,7 +80,7 @@ public:
     //4 ------------------------------------------------------------
     /*** @brief This function calculates the change in water reaching the cities when a reservoir is removed.
      * Output: Cities that have lost water are printed, alongside the amount of water in cubic meters per second
-     * Complexity: O()
+     * Complexity: O(V * E^2), because, even though it runs the optimized algorithm, it still calls the Edmonds-Karp algorithm before, to obtain the "default" flows arriving at the cities
      * @param graph The graph on which to run this operation.
     */
     static void shutDownReservoir(Graph* graph);
@@ -94,7 +94,7 @@ public:
     static std::vector<CityWaterLoss> CanShutDownReservoir(Graph* graph, const std::string& reservoirCode);
     /** @brief This function calculates the change in water reaching the cities when a reservoir is removed. It is optimized, so that the Edmonds-Karp does not need to be run in its entirety. However, the standard incoming flows of cities must already be set at the beginning of the algorithm. It is assumed that the super-source and super-sink exist in the graph. Due to this precondition, the wrapper function void shutDownReservoir(Graph* graph) was created. \n
     * Output:  If no errors occur, nothing will be printed \n
-    * Complexity:
+    * Complexity: In the worst case, it could be the same as running the Edmonds-Karp algorithm from zero (O(V * E^2)), but, in a lot of cases, a solution can be reached with a small number of iterations
     * @param graph The graph on which to run this operation
     * @param reservoirCode The reservoir which we are attempting to remove
     */
@@ -103,13 +103,13 @@ public:
     //5) ------------------------------------------------------------
     /** @brief This function calculates the change in water reaching the cities when a pumping station is removed.
     * Output: Cities that have lost water are printed, alongside the amount of water in cubic meters per second
-    * Complexity: O()
+    * Complexity: O(V * E^2), because, even though it runs the optimized algorithm, it still calls the Edmonds-Karp algorithm before, to obtain the "default" flows arriving at the cities
     * @param graph The graph on which to run this operation.
     */
     static void deletePumpingStation(Graph* g);
     /** @brief This function calculates the change in water reaching the cities when a pumping station is removed. It is optimized, so that the Edmonds-Karp does not need to be run in its entirety. However, the standard incoming flows of cities must already be set at the beginning of the algorithm. It is assumed that the super-source and super-sink exist in the graph. Due to this precondition, the wrapper function void shutDownReservoir(Graph* graph) was created. \n
     * Output: If successful, nothing is printed
-    * Complexity: O()
+    * Complexity: In the worst case, it could be the same as running the Edmonds-Karp algorithm from zero (O(V * E^2)), but, in a lot of cases, a solution can be reached with a small number of iterations
     * @param graph The graph on which to run this operation.
     * @param stationCode The pumping station to remove from the graph
     */
