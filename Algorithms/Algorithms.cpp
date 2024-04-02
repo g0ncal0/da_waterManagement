@@ -265,6 +265,7 @@ void Algorithms::BalanceTheLoad(Graph* g){
     Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
+
     /*
      * INITIAL IDEA: NO LONGER VIABLE
      * calculate the statistics in the beginning
@@ -301,41 +302,38 @@ void Algorithms::BalanceTheLoad(Graph* g){
     }
 
     for (Vertex* vertex : g->getVertexSet()) {
-        vector<Edge*> fullEdges;
-        int edgesWithSpace = 0;
+        if (vertex->getIncoming().size() <= 1) continue;
         int space = 0;
 
         for (Edge* edge : vertex->getIncoming()) {
-            if (edge->getFlow() == edge->getCapacity()) fullEdges.push_back(edge);
-            else {
-                edgesWithSpace++;
-                space += edge->getCapacity() - edge->getFlow();
-            }
+            space += edge->getCapacity() - edge->getFlow();
         }
 
-        if (fullEdges.empty()) continue;
-        space /= 2;
-        space /= (int)fullEdges.size();
+        int mean_space = space / (int)vertex->getIncoming().size();
 
-        for (Edge* edge : fullEdges) {
-            int maxFlow = space;
-            int improved = 0;
-            queue<Vertex*> q;
-            Vertex* source = edge->getOrig();
-            q.push(source);
-            source->setVisited(true);
+        for (Edge* edge : vertex->getIncoming()) {
+            int edge_space = edge->getCapacity() - edge->getFlow();
 
-            while (auxBFSBalanceTheLoad(g, q, source->getCode(), vertex->getCode(), maxFlow)) {
-                // Re-Initialize everything
-                for (Vertex* v : g->getVertexSet()) v->setVisited(false);
-
-                improved += maxFlow;
-                edge->setFlow(edge->getFlow() - maxFlow);
-                if ((improved == space) || (maxFlow == 0)) break;
-                maxFlow = space - improved;
-
+            if (edge_space < mean_space) {
+                int maxFlow = mean_space - edge_space;
+                int improved = 0;
+                queue<Vertex*> q;
+                Vertex* source = edge->getOrig();
+                q.push(source);
                 source->setVisited(true);
-                source->setPath(nullptr);
+
+                while (auxBFSBalanceTheLoad(g, q, source->getCode(), vertex->getCode(), maxFlow)) {
+                    // Re-Initialize everything
+                    for (Vertex* v : g->getVertexSet()) v->setVisited(false);
+
+                    improved += maxFlow;
+                    edge->setFlow(edge->getFlow() - maxFlow);
+                    if ((improved == space) || (maxFlow == 0)) break;
+                    maxFlow = space - improved;
+
+                    source->setVisited(true);
+                    source->setPath(nullptr);
+                }
             }
         }
     }
