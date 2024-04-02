@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['maximumtrip_73',['maximumTrip',['../class_model.html#a9dfd68a4b706b966ea081034016bdeec',1,'Model']]]
+  ['getadj_0',['getAdj',['../class_vertex.html#abb430e413ce9430fedd322af73955a6e',1,'Vertex']]]
 ];

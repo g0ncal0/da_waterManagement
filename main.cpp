@@ -73,7 +73,7 @@ int main() {
         }
     }
 
-    Menu::print("Thanks for using our program. This was developed by Filipe Correia, Gabriela Silva e Gonçalo Nunes.");
+    Menu::print("Thanks for using our program. This was developed by Filipe Correia, Gabriela Silva and Gonçalo Nunes.");
 
     return 0;
 }

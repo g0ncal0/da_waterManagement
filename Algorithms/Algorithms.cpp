@@ -13,10 +13,7 @@ using namespace std;
 using namespace std;
 
 
-/**
- * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities. O(N)
- * @param g graph
- */
+
 void Algorithms::calculateWaterInCities(Graph* g){
     for(Vertex* v: g->getVertexSet()){
         if(v->getType() == 'c'){
@@ -120,12 +117,6 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     return false;
 }
 
-/***
- * Normal BFS Edmonds Karp
- * @param g
- * @param q
- * @return
- */
 void Algorithms::simpleEdmondsKarp(Graph *g) {
     // Creation of SuperSource and SuperSink
     string name = "SuperSource";
@@ -222,7 +213,7 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoir(Graph* graph, const 
 }
 
 
-/***
+/**
  * Calculate statistics information of the graph - O(E + V)
  * @param g
  * @return struct with all statistics of graph
@@ -274,7 +265,7 @@ void Algorithms::BalanceTheLoad(Graph* g){
     Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
-    /**
+    /*
      * INITIAL IDEA: NO LONGER VIABLE
      * calculate the statistics in the beginning
      * for(all the cities)
@@ -293,7 +284,7 @@ void Algorithms::BalanceTheLoad(Graph* g){
 
 
 
-    /**
+    /*
      * New Algorithm:
      * while(exists an augmenting path){
      *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
@@ -439,11 +430,6 @@ bool Algorithms::auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std
 }
 
 
-/***
- * Traverses all cities, checking if amount of water reached is enough. O(n), where n is the number of vertixes of graph
- * @param graph
- * @return vector of cities that do not have enough water
- */
 std::vector<City*> Algorithms::CitiesWithNotEnoughWater(Graph* graph)
 {
     std::vector<City*> cities;
@@ -1015,7 +1001,7 @@ void Algorithms::AddSourceAndSink(Graph* graph)
 
 
 
-/***
+/**
  * Computes if any of the edges that is entering the vertex given is critical based on local information
  * REQUIRES RUNNING EDMONDS KARP BEFORE
  * @param vertex
@@ -1054,18 +1040,14 @@ void checkcritical(Vertex* vertex, int required, vector<Edge*>* vector){
 
 
 
-/***
- * Check critical pipelines by city. Uses a recursive algorithm that finds pipes that are likely to be critical. O(V * (V + E)).
- * @param graph
- * @return
- */
+
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::vector<WaterLossOnPipeDelete> res;
     std::unordered_map<City*, double> originalWaterValue;
 
 
     Menu::print("FOR THIS ALGORITHM, YOU NEED TO HAVE HAD RUN EDMONDS KARP (option 2)!");
-    /**
+    /*
      * for all cities:
      *  check if demands are met
      *  if so, checkcritical(city, demand, vector),

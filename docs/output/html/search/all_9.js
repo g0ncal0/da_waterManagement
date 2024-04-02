@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['waterlossonpipedelete_15',['WaterLossOnPipeDelete',['../struct_water_loss_on_pipe_delete.html',1,'']]],
-  ['waterlossonstationdelete_16',['WaterLossOnStationDelete',['../struct_water_loss_on_station_delete.html',1,'']]]
+  ['setflowtozero_0',['SetFlowToZero',['../class_algorithms.html#afb2b4b3375b3295fdf4323c856583258',1,'Algorithms']]],
+  ['station_1',['Station',['../class_station.html',1,'']]]
 ];
