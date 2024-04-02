@@ -14,7 +14,7 @@ using namespace std;
 
 
 /**
- * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities.
+ * A simple algorithm to calculate the water that enters every city O(n). Changes the totalwaterin var in the cities. O(N)
  * @param g graph
  */
 void Algorithms::calculateWaterInCities(Graph* g){
@@ -693,7 +693,6 @@ std::vector<CityWaterLoss> Algorithms::CanShutDownReservoirOptimized(Graph* grap
                 waterIn+=edge->getFlow();
             }
 
-
             originalWaterValue.emplace((City*)vertex,waterIn);
 
         }
@@ -1054,6 +1053,12 @@ void checkcritical(Vertex* vertex, int required, vector<Edge*>* vector){
 
 
 
+
+/***
+ * Check critical pipelines by city. Uses a recursive algorithm that finds pipes that are likely to be critical. O(V * (V + E)).
+ * @param graph
+ * @return
+ */
 std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
     std::vector<WaterLossOnPipeDelete> res;
     std::unordered_map<City*, double> originalWaterValue;
@@ -1067,7 +1072,6 @@ std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
      */
 
 
-    // HERE: I MUST UPDATE THE INcOMING edges: so that after it can understand them.
     // HERE: I must update a attribute max-flow at edge so that i can understand how much a edge can really bring to table if needed
     // and understand if others are critical
 
