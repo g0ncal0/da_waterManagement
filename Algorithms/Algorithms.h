@@ -34,12 +34,6 @@ struct WaterLossOnPipeDelete{
     std::vector<CityWaterLoss> waterLoss;
 };
 
-struct WaterLossOnPipeline {
-    std::string pipe;
-    std::vector<CityWaterLoss> waterLoss;
-};
-
-
 
 //Note: Functions assume that all necessary "previous functions" have been called
 
