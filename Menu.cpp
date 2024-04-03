@@ -89,9 +89,9 @@ std::string Menu::getInput(std::string text){
 
 void Menu::printCities(std::vector<City*> v, std::string text){
     print(text);
-    print("CITY NAME | CODE | WATER IN | DEMAND");
+    print("CITY NAME | CODE | WATER IN | DEMAND | DEFICIT");
     for(City* city : v){
-        std::cout << city->getName() << " " << city->getCode() << " " << city->getTotalWaterIn() <<" " << city->getDemand() <<"\n";
+        std::cout << city->getName() << " " << city->getCode() << " " << city->getTotalWaterIn() <<" " << city->getDemand() << " " << city->getDemand() - city->getTotalWaterIn() << "\n";
     }
 }
 
