@@ -53,7 +53,6 @@ void Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g)
 
 }
 
-
 bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     while (!q.empty()) {
         Vertex* v = q.front();
@@ -273,36 +272,6 @@ void Algorithms::BalanceTheLoad(Graph* g){
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
 
-    /*
-     * INITIAL IDEA: NO LONGER VIABLE
-     * calculate the statistics in the beginning
-     * for(all the cities)
-     *  if(city capacity > demand)
-     *      excess = capacity - demand;
-     *      remove that excess from the capacity of the city
-     *      repeat:
-     *        find a path from the city to reservoir
-     *        find the max weight of the path
-     *        remove that weight (max(weight, excess))
-     *        decrease excess by how much it was removed
-     *      until excess <= 0;
-     *
-     * calculate statistics again
-     */
-
-
-
-    /*
-     * New Algorithm:
-     * while(exists an augmenting path){
-     *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
-     *  for each augmenting path find 70% of max flow capacity
-     *  increment a counter on graph edges
-     *
-     *  check if number of cities with enough water is equal to beginning. if it is, stop.
-     *
-     */
-
     for (Vertex* vertex : g->getVertexSet()) {
         vertex->setVisited(false);
         vertex->setPath(nullptr);
@@ -350,7 +319,6 @@ void Algorithms::BalanceTheLoad(Graph* g){
     GlobalStatisticsEdges endstats = calculatestatistics(g);
     Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
 }
-
 
 bool Algorithms::auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std::string& source, const std::string& sink, int& maxFlow) {
     while (!q.empty()) {
@@ -438,36 +406,6 @@ void Algorithms::BalanceTheLoad2(Graph* g) {
     Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
-
-    /*
-     * INITIAL IDEA: NO LONGER VIABLE
-     * calculate the statistics in the beginning
-     * for(all the cities)
-     *  if(city capacity > demand)
-     *      excess = capacity - demand;
-     *      remove that excess from the capacity of the city
-     *      repeat:
-     *        find a path from the city to reservoir
-     *        find the max weight of the path
-     *        remove that weight (max(weight, excess))
-     *        decrease excess by how much it was removed
-     *      until excess <= 0;
-     *
-     * calculate statistics again
-     */
-
-
-
-    /*
-     * New Algorithm:
-     * while(exists an augmenting path){
-     *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
-     *  for each augmenting path find 70% of max flow capacity
-     *  increment a counter on graph edges
-     *
-     *  check if number of cities with enough water is equal to beginning. if it is, stop.
-     *
-     */
 
     for (Vertex* vertex : g->getVertexSet()) {
         vertex->setVisited(false);

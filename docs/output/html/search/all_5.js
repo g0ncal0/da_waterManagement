@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['getadj_0',['getAdj',['../class_vertex.html#abb430e413ce9430fedd322af73955a6e',1,'Vertex']]],
-  ['globalstatisticsedges_1',['GlobalStatisticsEdges',['../struct_global_statistics_edges.html',1,'']]],
-  ['graph_2',['Graph',['../class_graph.html',1,'']]]
+  ['findaugmentationpathtoreservoir_20',['findAugmentationPathToReservoir',['../class_algorithms.html#a17dd942408e417520e2c4ee10699352a',1,'Algorithms']]],
+  ['findpathtoreservoir_21',['findPathToReservoir',['../class_algorithms.html#a4a6644c2b4134abac2d83df6a43dbb57',1,'Algorithms']]]
 ];

@@ -48,13 +48,19 @@ public:
      */
     static void calculateWaterInCities(Graph* g);
    //1 ------------------------------------------------------------
+    /**
+     * A BFS search to find an augmentation path in g.
+     * O (V + E)
+     * @param g the graph
+     * @param q the queue that contains the pointers to the reservoirs in the beginning
+     * @return true if it could find an augmentation path
+     */
     static bool BFSEdmondsKarp(Graph* g, std::queue<Vertex*> q);
 
     /**
-     * Normal BFS Edmonds Karp
-     * @param g
-     * @param q
-     * @return
+     * Simple Edmonds-Karp using BFS.
+     * O(V E²)
+     * @param g the graph
      */
     static void simpleEdmondsKarp(Graph *g);
     static void simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g);
@@ -69,11 +75,52 @@ public:
     //3 ------------------------------------------------------------
     static void ChooseBalanceTheLoad(Graph* g);
 
+    /**
+     * BalanceTheLoad with the logic of redirecting excess water to another augmentation path.
+     * O((V + E)²) -> O((V+E) * (V + E)) -> for each vertex for each incoming edge does a few (mostly between 0-2) BFS searches.
+     * @param g the graph
+     */
     static void BalanceTheLoad(Graph* g);
+
+    /**
+     * A BFS that tries to find an augmentation path between source and sink.
+     * O(V + E)
+     * @param g the graph
+     * @param q the queue that contains the pointer to the source in the beginning
+     * @param source the code of source
+     * @param sink the code of sink
+     * @param maxFlow of the augmentation path
+     * @return true if it could find an augmentation path
+     */
     static bool auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std::string& source, const std::string& sink, int& maxFlow);
 
+
+    /**
+     * BalanceTheLoad with the logic of taking excess water and trying to put that water in another augmentation path.
+     * O((V + E)³ * E) -> O((V + E) * (V + E) * E * (V + E)) -> for each vertex for each incoming edge does one BFS search, then for each incoming vertex does a few (mostly between 0-2) BFS searches.
+     * This complexity is only in the very worst case; the real complexity is much lower because even the first BFS won't run in a large part of vertexes, the majority of the BFS are not complete, and the factor E is just the incoming edges of that vertex.
+     * @param g the graph
+     */
     static void BalanceTheLoad2(Graph* g);
+
+    /**
+     * Tries to find a path with a few flow between origin and one reservoir with a BFS.
+     * O(V + E)
+     * @param g the graph
+     * @param origin the code of origin
+     * @param path a vector where we save the path between origin and a reservoir
+     * @return true if it could find a path
+     */
     static int findPathToReservoir(Graph* g, Vertex* origin, std::vector<Edge*>& path);
+
+    /**
+     * Tries to find an augmentation path with a few space between origin and one reservoir with a BFS.
+     * O(V + E)
+     * @param g the graph
+     * @param origin the code of origin
+     * @param path a vector where we save the path between origin and a reservoir
+     * @return true if it could find a path
+     */
     static int findAugmentationPathToReservoir(Graph* g, Vertex* origin, std::vector<Edge*>& path);
 
     //4 ------------------------------------------------------------

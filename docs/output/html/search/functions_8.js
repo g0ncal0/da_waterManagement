@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['removeclass_65',['removeClass',['../class_student.html#ae1fd157330c52bae483550626ec8bcfd',1,'Student']]],
-  ['removeclassstudent_66',['removeClassStudent',['../class_all_students.html#a06a1d686eda1231beac6791d64793910',1,'AllStudents']]],
-  ['removestudent_67',['removeStudent',['../class_all_students.html#ab0b633e2d971aaf21baaf3500fc43fbe',1,'AllStudents']]]
+  ['setflowtozero_69',['SetFlowToZero',['../class_algorithms.html#afb2b4b3375b3295fdf4323c856583258',1,'Algorithms']]],
+  ['simpleedmondskarp_70',['simpleEdmondsKarp',['../class_algorithms.html#a000ad3955ec9ff8d7a3009b0946bdbe4',1,'Algorithms']]]
 ];
