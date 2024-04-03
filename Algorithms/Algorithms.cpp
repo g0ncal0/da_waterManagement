@@ -260,6 +260,13 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
     return res;
 }
 
+void Algorithms::ChooseBalanceTheLoad(Graph* g) {
+    int choice;
+    cout << "Which algorithm you want to use?\n1. It is simpler but may have worst results in Large Data Set\n2. It is heavier but gets better results in Large Data Set\n";
+    cin >> choice;
+    if (choice == 1) BalanceTheLoad(g);
+    else BalanceTheLoad2(g);
+}
 
 void Algorithms::BalanceTheLoad(Graph* g){
     Menu::print("The initial statistics");
@@ -425,6 +432,174 @@ bool Algorithms::auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std
     }
 
     return false;
+}
+
+void Algorithms::BalanceTheLoad2(Graph* g) {
+    Menu::print("The initial statistics");
+    GlobalStatisticsEdges stats = calculatestatistics(g);
+    Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
+
+    /*
+     * INITIAL IDEA: NO LONGER VIABLE
+     * calculate the statistics in the beginning
+     * for(all the cities)
+     *  if(city capacity > demand)
+     *      excess = capacity - demand;
+     *      remove that excess from the capacity of the city
+     *      repeat:
+     *        find a path from the city to reservoir
+     *        find the max weight of the path
+     *        remove that weight (max(weight, excess))
+     *        decrease excess by how much it was removed
+     *      until excess <= 0;
+     *
+     * calculate statistics again
+     */
+
+
+
+    /*
+     * New Algorithm:
+     * while(exists an augmenting path){
+     *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
+     *  for each augmenting path find 70% of max flow capacity
+     *  increment a counter on graph edges
+     *
+     *  check if number of cities with enough water is equal to beginning. if it is, stop.
+     *
+     */
+
+    for (Vertex* vertex : g->getVertexSet()) {
+        vertex->setVisited(false);
+        vertex->setPath(nullptr);
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) {
+        if (vertex->getIncoming().size() <= 1) continue;
+
+        for (Edge* edge : vertex->getIncoming()) {
+            int edge_space = edge->getCapacity() - edge->getFlow();
+
+            if (edge_space < (int)stats.avg) {
+                //tirar água que está a stressar a rede
+                int goal = (int)stats.avg - edge_space;
+                vector<Edge*> path;
+                path.push_back(edge);
+                goal = min(goal, (int)edge->getFlow());
+                goal = min(goal, findPathToReservoir(g, edge->getOrig(), path));
+                if (goal == 0) continue;
+                for (Edge* edge1 : path) edge1->setFlow(edge1->getFlow() - goal);
+
+                //tentar encontrar outro caminho para a água
+                for (Edge* edge2 : vertex->getIncoming()) {
+                    int edge2_space = edge2->getCapacity() - edge2->getFlow();
+
+                    if (edge2_space > (int)stats.avg) {
+                        int goal2 = edge2_space - (int)stats.avg;
+                        goal2 = min(goal, goal2);
+                        goal2 = min(goal2, (int)edge2->getCapacity() - (int)edge2->getFlow());
+                        vector<Edge*> path2;
+                        path2.push_back(edge2);
+                        goal2 = min(goal2, findAugmentationPathToReservoir(g, edge2->getOrig(), path2));
+                        if (goal2 == 0) continue;
+                        for (Edge* edge1 : path2) edge1->setFlow(edge1->getFlow() + goal2);
+                        goal -= goal2;
+                        if (goal == 0) break;
+                    }
+                }
+
+                if (goal > 0) {
+                    for (Edge* edge1 : path) edge1->setFlow(edge1->getFlow() + goal);
+                }
+            }
+        }
+    }
+
+    Menu::print("The end statistics");
+    GlobalStatisticsEdges endstats = calculatestatistics(g);
+    Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
+}
+
+int Algorithms::findPathToReservoir(Graph* g, Vertex* origin, vector<Edge*>& path) {
+    origin->setVisited(true);
+    queue<Vertex*> q;
+    q.push(origin);
+    Vertex* reservoir = nullptr;
+
+    while (!q.empty() && (reservoir == nullptr)) {
+        Vertex* vertex = q.front();
+        q.pop();
+
+        for (Edge* edge : vertex->getIncoming()) {
+            if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 49)) {
+                if (edge->getOrig()->getType() == 'r') {
+                    edge->getOrig()->setPath(edge);
+                    reservoir = vertex;
+                    break;
+                }
+
+                edge->getOrig()->setVisited(true);
+                edge->getOrig()->setPath(edge);
+                q.push(edge->getOrig());
+            }
+        }
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) vertex->setVisited(false);
+    if (reservoir == nullptr) return 0;
+
+    Vertex* aux = reservoir;
+    int minFlow = INT_MAX;
+
+    while (aux != origin) {
+        if (aux->getPath()->getFlow() < minFlow) minFlow = aux->getPath()->getFlow();
+        path.push_back(aux->getPath());
+        aux = aux->getPath()->getDest();
+    }
+
+    return minFlow;
+}
+
+int Algorithms::findAugmentationPathToReservoir(Graph* g, Vertex* origin, std::vector<Edge*>& path) {
+    origin->setVisited(true);
+    queue<Vertex*> q;
+    q.push(origin);
+    Vertex* reservoir = nullptr;
+
+    while (!q.empty() && (reservoir == nullptr)) {
+        Vertex* vertex = q.front();
+        q.pop();
+
+        for (Edge* edge : vertex->getIncoming()) {
+            if ((!edge->getOrig()->isVisited()) && ((edge->getCapacity() - edge->getFlow()) > 49)) {
+                if (edge->getOrig()->getType() == 'r') {
+                    edge->getOrig()->setPath(edge);
+                    reservoir = vertex;
+                    break;
+                }
+
+                edge->getOrig()->setVisited(true);
+                edge->getOrig()->setPath(edge);
+                q.push(edge->getOrig());
+            }
+        }
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) vertex->setVisited(false);
+    if (reservoir == nullptr) return 0;
+
+    Vertex* aux = reservoir;
+    int minFlow = INT_MAX;
+
+    while (aux != origin) {
+        int capacity = aux->getPath()->getCapacity() - aux->getPath()->getFlow();
+
+        if (capacity < minFlow) minFlow = capacity;
+        path.push_back(aux->getPath());
+        aux = aux->getPath()->getDest();
+    }
+
+    return minFlow;
 }
 
 

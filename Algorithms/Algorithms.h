@@ -67,9 +67,14 @@ public:
      */
     static std::vector<City*> CitiesWithNotEnoughWater(Graph* g);
     //3 ------------------------------------------------------------
+    static void ChooseBalanceTheLoad(Graph* g);
 
     static void BalanceTheLoad(Graph* g);
     static bool auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std::string& source, const std::string& sink, int& maxFlow);
+
+    static void BalanceTheLoad2(Graph* g);
+    static int findPathToReservoir(Graph* g, Vertex* origin, std::vector<Edge*>& path);
+    static int findAugmentationPathToReservoir(Graph* g, Vertex* origin, std::vector<Edge*>& path);
 
     //4 ------------------------------------------------------------
     /*** @brief This function calculates the change in water reaching the cities when a reservoir is removed.
