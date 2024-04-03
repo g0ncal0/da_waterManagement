@@ -97,7 +97,7 @@ public:
 
     /**
      * BalanceTheLoad with the logic of taking excess water and trying to put that water in another augmentation path.
-     * O((V + E)³ * E) -> O((V + E) * (V + E) * E * (V + E)) -> for each vertex for each incoming edge does one BFS search, then for each incoming vertex does a few (mostly between 0-2) BFS searches.
+     * O((V + E)³ * E) -> O((V + E) * (V + E) * E * (V + E)) -> for each vertex for each incoming edge does one BFS search, then for each incoming edge of that vertex does a few (mostly between 0-2) BFS searches.
      * This complexity is only in the very worst case; the real complexity is much lower because even the first BFS won't run in a large part of vertexes, the majority of the BFS are not complete, and the factor E is just the incoming edges of that vertex.
      * @param g the graph
      */
