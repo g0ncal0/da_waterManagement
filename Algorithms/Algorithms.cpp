@@ -654,7 +654,7 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 
 }
 
-//WRONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+
 void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
 {
     queue<Vertex*> q;
@@ -758,6 +758,7 @@ void Algorithms::shutDownReservoir(Graph* graph){
     // Do the computation
     Algorithms::AddSourceAndSink(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
+    //Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
     auto res1= Algorithms::CanShutDownReservoirOptimized(graph,reservTOREMOVE);
 
     // To display to user
@@ -985,7 +986,7 @@ void Algorithms::deletePumpingStation(Graph *graph) {
     std::string pumpStation = Menu::getInput("Code of pumping station to remove");
     Algorithms::AddSourceAndSink(graph);
     Algorithms::SetFlowToZero(graph);
-    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph); //all my edmonds-karp are failing, for some reason...
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph);
     auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,pumpStation);
 
@@ -1096,7 +1097,7 @@ void Algorithms::AddSourceAndSink(Graph* graph)
                 incomingFlow+=edge->getFlow();
             }
 
-            graph->addEdge(v->getCode(), "Sink", INT_MAX);
+            graph->addEdge(v->getCode(), "Sink", ((City*)v)->getDemand());
             for (Edge* edge: v->getAdj()) {
                 if(edge->getDest()->getCode()=="Sink")
                 {
