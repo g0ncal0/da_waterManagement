@@ -82,7 +82,20 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
 
             while (edge != nullptr) {
                 if (vertex == edge->getDest()) {
-                    edge->setFlow(edge->getFlow() + minFlow);
+                    if (edge->getReverse() == nullptr) edge->setFlow(edge->getFlow() + minFlow);
+
+                    else { //tratamento de edges bidirecionais
+                        int flow = edge->getFlow();
+                        int reverse_flow = edge->getReverse()->getFlow();
+
+                        if (reverse_flow == 0) edge->setFlow(flow + minFlow);
+                        else if (reverse_flow >= minFlow) edge->getReverse()->setFlow(reverse_flow - minFlow);
+                        else {
+                            edge->setFlow(minFlow - reverse_flow);
+                            edge->getReverse()->setFlow(0);
+                        }
+                    }
+
                     vertex = edge->getOrig();
                 }
                 else {
@@ -509,7 +522,7 @@ int Algorithms::findAugmentationPathToReservoir(Graph* g, Vertex* origin, std::v
         q.pop();
 
         for (Edge* edge : vertex->getIncoming()) {
-            if ((!edge->getOrig()->isVisited()) && ((edge->getCapacity() - edge->getFlow()) > 49)) {
+            if ((!edge->getOrig()->isVisited()) && ((edge->getCapacity() - edge->getFlow()) > 49) && ((edge->getReverse() == nullptr) || (edge->getFlow() > 0))) {
                 if (edge->getOrig()->getType() == 'r') {
                     edge->getOrig()->setPath(edge);
                     reservoir = vertex;
