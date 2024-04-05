@@ -713,10 +713,47 @@ void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and d
 
                 while (edge != nullptr) {
                     if (vertex == edge->getDest()) {
+                        if(edge->getReverse()==nullptr){
                         edge->setFlow(edge->getFlow() + minFlow);
+                        } else
+                        {
+                            int flow =edge->getFlow();
+                            int reverseFlow=edge->getReverse()->getFlow();
+
+                            if (reverseFlow==0)
+                            {
+                                edge->setFlow(flow+minFlow);
+                            }else if (reverseFlow >=minFlow)
+                            {
+                                edge->getReverse()->setFlow(reverseFlow-minFlow);
+                            }else{
+                                edge->setFlow(minFlow-reverseFlow);
+                                edge->getReverse()->setFlow(0);
+                            }
+                        }
                         vertex = edge->getOrig();
+
                     } else {
-                        edge->setFlow(edge->getFlow() - minFlow);
+                       // if (edge->getReverse()==0) {
+                            edge->setFlow(edge->getFlow() - minFlow);
+                       /* }else
+                        {
+                            int flow =edge->getFlow();
+                            int reverseFlow=edge->getReverse()->getFlow();
+                            //this part is completely wrong anyway
+                            if (flow==0)
+                            {
+                                edge->getReverse()->setFlow(flow+minFlow);
+                            }else if (flow >=minFlow)
+                            {
+                                edge->getReverse()->setFlow(reverseFlow-minFlow);
+                            }else{
+                                edge->setFlow(minFlow-reverseFlow);
+                                edge->getReverse()->setFlow(0);
+                            }
+
+                        }
+*/
                         vertex = edge->getDest();
                     }
 
@@ -771,8 +808,9 @@ void Algorithms::shutDownReservoir(Graph* graph){
     // Do the computation
     Algorithms::AddSourceAndSink(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
-    //Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
-    auto res1= Algorithms::CanShutDownReservoirOptimized(graph,reservTOREMOVE);
+    Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
+    Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
+    auto res1= Algorithms::CanShutDownReservoir/*Optimized*/(graph,reservTOREMOVE);
 
     // To display to user
     std::stringstream re;
@@ -951,6 +989,8 @@ void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vertex)
     }
 
 }
+
+
 
 //This one probably won't be used in the end...
 std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode)

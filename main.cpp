@@ -8,7 +8,7 @@ using namespace std;
 int main() {
 
 
-    int m = Menu::getNumber("Choose model to work on. MADEIRA: 0; PT: 1 ");
+    int m = Menu::getNumber("Choose model to work on. MADEIRA: 0; PT: 1  ");
     Graph *graph;
     try {
         Parser p;
