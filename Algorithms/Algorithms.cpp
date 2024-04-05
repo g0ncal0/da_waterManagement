@@ -809,8 +809,7 @@ void Algorithms::shutDownReservoir(Graph* graph){
     Algorithms::AddSourceAndSink(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
-    Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
-    auto res1= Algorithms::CanShutDownReservoir/*Optimized*/(graph,reservTOREMOVE);
+    auto res1= Algorithms::CanShutDownReservoir(graph,reservTOREMOVE);
 
     // To display to user
     std::stringstream re;
