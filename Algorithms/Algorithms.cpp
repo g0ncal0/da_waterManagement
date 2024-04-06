@@ -53,7 +53,6 @@ void Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(Graph *g)
 
 }
 
-
 bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
     while (!q.empty()) {
         Vertex* v = q.front();
@@ -83,7 +82,20 @@ bool Algorithms::BFSEdmondsKarp(Graph* g, queue<Vertex*> q) {
 
             while (edge != nullptr) {
                 if (vertex == edge->getDest()) {
-                    edge->setFlow(edge->getFlow() + minFlow);
+                    if (edge->getReverse() == nullptr) edge->setFlow(edge->getFlow() + minFlow);
+
+                    else { //tratamento de edges bidirecionais
+                        int flow = edge->getFlow();
+                        int reverse_flow = edge->getReverse()->getFlow();
+
+                        if (reverse_flow == 0) edge->setFlow(flow + minFlow);
+                        else if (reverse_flow >= minFlow) edge->getReverse()->setFlow(reverse_flow - minFlow);
+                        else {
+                            edge->setFlow(minFlow - reverse_flow);
+                            edge->getReverse()->setFlow(0);
+                        }
+                    }
+
                     vertex = edge->getOrig();
                 }
                 else {
@@ -260,40 +272,18 @@ GlobalStatisticsEdges calculatestatistics(Graph* g){
     return res;
 }
 
+void Algorithms::ChooseBalanceTheLoad(Graph* g) {
+    int choice;
+    cout << "Which algorithm you want to use?\n1. It is simpler but may have worst results in Large Data Set\n2. It is heavier but gets better results in Large Data Set\n";
+    cin >> choice;
+    if (choice == 1) BalanceTheLoad(g);
+    else BalanceTheLoad2(g);
+}
 
 void Algorithms::BalanceTheLoad(Graph* g){
     Menu::print("The initial statistics");
     GlobalStatisticsEdges stats = calculatestatistics(g);
     Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
-    /*
-     * INITIAL IDEA: NO LONGER VIABLE
-     * calculate the statistics in the beginning
-     * for(all the cities)
-     *  if(city capacity > demand)
-     *      excess = capacity - demand;
-     *      remove that excess from the capacity of the city
-     *      repeat:
-     *        find a path from the city to reservoir
-     *        find the max weight of the path
-     *        remove that weight (max(weight, excess))
-     *        decrease excess by how much it was removed
-     *      until excess <= 0;
-     *
-     * calculate statistics again
-     */
-
-
-
-    /*
-     * New Algorithm:
-     * while(exists an augmenting path){
-     *  choose the augmenting path by increasing order of percentage of difference between flow and capacity
-     *  for each augmenting path find 70% of max flow capacity
-     *  increment a counter on graph edges
-     *
-     *  check if number of cities with enough water is equal to beginning. if it is, stop.
-     *
-     */
 
     for (Vertex* vertex : g->getVertexSet()) {
         vertex->setVisited(false);
@@ -301,41 +291,38 @@ void Algorithms::BalanceTheLoad(Graph* g){
     }
 
     for (Vertex* vertex : g->getVertexSet()) {
-        vector<Edge*> fullEdges;
-        int edgesWithSpace = 0;
+        if (vertex->getIncoming().size() <= 1) continue;
         int space = 0;
 
         for (Edge* edge : vertex->getIncoming()) {
-            if (edge->getFlow() == edge->getCapacity()) fullEdges.push_back(edge);
-            else {
-                edgesWithSpace++;
-                space += edge->getCapacity() - edge->getFlow();
-            }
+            space += edge->getCapacity() - edge->getFlow();
         }
 
-        if (fullEdges.empty()) continue;
-        space /= 2;
-        space /= (int)fullEdges.size();
+        int mean_space = space / (int)vertex->getIncoming().size();
 
-        for (Edge* edge : fullEdges) {
-            int maxFlow = space;
-            int improved = 0;
-            queue<Vertex*> q;
-            Vertex* source = edge->getOrig();
-            q.push(source);
-            source->setVisited(true);
+        for (Edge* edge : vertex->getIncoming()) {
+            int edge_space = edge->getCapacity() - edge->getFlow();
 
-            while (auxBFSBalanceTheLoad(g, q, source->getCode(), vertex->getCode(), maxFlow)) {
-                // Re-Initialize everything
-                for (Vertex* v : g->getVertexSet()) v->setVisited(false);
-
-                improved += maxFlow;
-                edge->setFlow(edge->getFlow() - maxFlow);
-                if ((improved == space) || (maxFlow == 0)) break;
-                maxFlow = space - improved;
-
+            if (edge_space < mean_space) {
+                int maxFlow = mean_space - edge_space;
+                int improved = 0;
+                queue<Vertex*> q;
+                Vertex* source = edge->getOrig();
+                q.push(source);
                 source->setVisited(true);
-                source->setPath(nullptr);
+
+                while (auxBFSBalanceTheLoad(g, q, source->getCode(), vertex->getCode(), maxFlow)) {
+                    // Re-Initialize everything
+                    for (Vertex* v : g->getVertexSet()) v->setVisited(false);
+
+                    improved += maxFlow;
+                    edge->setFlow(edge->getFlow() - maxFlow);
+                    if ((improved == space) || (maxFlow == 0)) break;
+                    maxFlow = space - improved;
+
+                    source->setVisited(true);
+                    source->setPath(nullptr);
+                }
             }
         }
     }
@@ -345,7 +332,6 @@ void Algorithms::BalanceTheLoad(Graph* g){
     GlobalStatisticsEdges endstats = calculatestatistics(g);
     Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
 }
-
 
 bool Algorithms::auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std::string& source, const std::string& sink, int& maxFlow) {
     while (!q.empty()) {
@@ -427,6 +413,144 @@ bool Algorithms::auxBFSBalanceTheLoad(Graph* g, std::queue<Vertex*> q, const std
     }
 
     return false;
+}
+
+void Algorithms::BalanceTheLoad2(Graph* g) {
+    Menu::print("The initial statistics");
+    GlobalStatisticsEdges stats = calculatestatistics(g);
+    Menu::printStatistics(stats.avg, stats.max_difference, stats.variance, stats.n_edges);
+
+    for (Vertex* vertex : g->getVertexSet()) {
+        vertex->setVisited(false);
+        vertex->setPath(nullptr);
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) {
+        if (vertex->getIncoming().size() <= 1) continue;
+
+        for (Edge* edge : vertex->getIncoming()) {
+            int edge_space = edge->getCapacity() - edge->getFlow();
+
+            if (edge_space < (int)stats.avg) {
+                //tirar água que está a stressar a rede
+                int goal = (int)stats.avg - edge_space;
+                vector<Edge*> path;
+                path.push_back(edge);
+                goal = min(goal, (int)edge->getFlow());
+                goal = min(goal, findPathToReservoir(g, edge->getOrig(), path));
+                if (goal == 0) continue;
+                for (Edge* edge1 : path) edge1->setFlow(edge1->getFlow() - goal);
+
+                //tentar encontrar outro caminho para a água
+                for (Edge* edge2 : vertex->getIncoming()) {
+                    int edge2_space = edge2->getCapacity() - edge2->getFlow();
+
+                    if (edge2_space > (int)stats.avg) {
+                        int goal2 = edge2_space - (int)stats.avg;
+                        goal2 = min(goal, goal2);
+                        goal2 = min(goal2, (int)edge2->getCapacity() - (int)edge2->getFlow());
+                        vector<Edge*> path2;
+                        path2.push_back(edge2);
+                        goal2 = min(goal2, findAugmentationPathToReservoir(g, edge2->getOrig(), path2));
+                        if (goal2 == 0) continue;
+                        for (Edge* edge1 : path2) edge1->setFlow(edge1->getFlow() + goal2);
+                        goal -= goal2;
+                        if (goal == 0) break;
+                    }
+                }
+
+                if (goal > 0) {
+                    for (Edge* edge1 : path) edge1->setFlow(edge1->getFlow() + goal);
+                }
+            }
+        }
+    }
+
+    Menu::print("The end statistics");
+    GlobalStatisticsEdges endstats = calculatestatistics(g);
+    Menu::printStatistics(endstats.avg, endstats.max_difference, endstats.variance, endstats.n_edges);
+}
+
+int Algorithms::findPathToReservoir(Graph* g, Vertex* origin, vector<Edge*>& path) {
+    origin->setVisited(true);
+    queue<Vertex*> q;
+    q.push(origin);
+    Vertex* reservoir = nullptr;
+
+    while (!q.empty() && (reservoir == nullptr)) {
+        Vertex* vertex = q.front();
+        q.pop();
+
+        for (Edge* edge : vertex->getIncoming()) {
+            if ((!edge->getOrig()->isVisited()) && (edge->getFlow() > 49)) {
+                if (edge->getOrig()->getType() == 'r') {
+                    edge->getOrig()->setPath(edge);
+                    reservoir = vertex;
+                    break;
+                }
+
+                edge->getOrig()->setVisited(true);
+                edge->getOrig()->setPath(edge);
+                q.push(edge->getOrig());
+            }
+        }
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) vertex->setVisited(false);
+    if (reservoir == nullptr) return 0;
+
+    Vertex* aux = reservoir;
+    int minFlow = INT_MAX;
+
+    while (aux != origin) {
+        if (aux->getPath()->getFlow() < minFlow) minFlow = aux->getPath()->getFlow();
+        path.push_back(aux->getPath());
+        aux = aux->getPath()->getDest();
+    }
+
+    return minFlow;
+}
+
+int Algorithms::findAugmentationPathToReservoir(Graph* g, Vertex* origin, std::vector<Edge*>& path) {
+    origin->setVisited(true);
+    queue<Vertex*> q;
+    q.push(origin);
+    Vertex* reservoir = nullptr;
+
+    while (!q.empty() && (reservoir == nullptr)) {
+        Vertex* vertex = q.front();
+        q.pop();
+
+        for (Edge* edge : vertex->getIncoming()) {
+            if ((!edge->getOrig()->isVisited()) && ((edge->getCapacity() - edge->getFlow()) > 49) && ((edge->getReverse() == nullptr) || (edge->getFlow() > 0))) {
+                if (edge->getOrig()->getType() == 'r') {
+                    edge->getOrig()->setPath(edge);
+                    reservoir = vertex;
+                    break;
+                }
+
+                edge->getOrig()->setVisited(true);
+                edge->getOrig()->setPath(edge);
+                q.push(edge->getOrig());
+            }
+        }
+    }
+
+    for (Vertex* vertex : g->getVertexSet()) vertex->setVisited(false);
+    if (reservoir == nullptr) return 0;
+
+    Vertex* aux = reservoir;
+    int minFlow = INT_MAX;
+
+    while (aux != origin) {
+        int capacity = aux->getPath()->getCapacity() - aux->getPath()->getFlow();
+
+        if (capacity < minFlow) minFlow = capacity;
+        path.push_back(aux->getPath());
+        aux = aux->getPath()->getDest();
+    }
+
+    return minFlow;
 }
 
 
@@ -543,7 +667,7 @@ void RemoveWaterFromVertexToSink(Graph* graph,Vertex* vertex)
 
 }
 
-//WRONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+
 void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and doesn't do initialization
 {
     queue<Vertex*> q;
@@ -589,10 +713,47 @@ void Algorithms::EdmondsKarpThatIgnoresVertex(Graph* graph,Vertex* vertx)//and d
 
                 while (edge != nullptr) {
                     if (vertex == edge->getDest()) {
+                        if(edge->getReverse()==nullptr){
                         edge->setFlow(edge->getFlow() + minFlow);
+                        } else
+                        {
+                            int flow =edge->getFlow();
+                            int reverseFlow=edge->getReverse()->getFlow();
+
+                            if (reverseFlow==0)
+                            {
+                                edge->setFlow(flow+minFlow);
+                            }else if (reverseFlow >=minFlow)
+                            {
+                                edge->getReverse()->setFlow(reverseFlow-minFlow);
+                            }else{
+                                edge->setFlow(minFlow-reverseFlow);
+                                edge->getReverse()->setFlow(0);
+                            }
+                        }
                         vertex = edge->getOrig();
+
                     } else {
-                        edge->setFlow(edge->getFlow() - minFlow);
+                       // if (edge->getReverse()==0) {
+                            edge->setFlow(edge->getFlow() - minFlow);
+                       /* }else
+                        {
+                            int flow =edge->getFlow();
+                            int reverseFlow=edge->getReverse()->getFlow();
+                            //this part is completely wrong anyway
+                            if (flow==0)
+                            {
+                                edge->getReverse()->setFlow(flow+minFlow);
+                            }else if (flow >=minFlow)
+                            {
+                                edge->getReverse()->setFlow(reverseFlow-minFlow);
+                            }else{
+                                edge->setFlow(minFlow-reverseFlow);
+                                edge->getReverse()->setFlow(0);
+                            }
+
+                        }
+*/
                         vertex = edge->getDest();
                     }
 
@@ -647,7 +808,8 @@ void Algorithms::shutDownReservoir(Graph* graph){
     // Do the computation
     Algorithms::AddSourceAndSink(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
-    auto res1= Algorithms::CanShutDownReservoirOptimized(graph,reservTOREMOVE);
+    Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
+    auto res1= Algorithms::CanShutDownReservoir(graph,reservTOREMOVE);
 
     // To display to user
     std::stringstream re;
@@ -827,6 +989,8 @@ void RemoveWaterFromSourcesToVertex(Graph* graph,Vertex* vertex)
 
 }
 
+
+
 //This one probably won't be used in the end...
 std::vector<CityWaterLoss> Algorithms::CanDeletePumpingStationFrom0(Graph* graph, const std::string& stationCode)
 {
@@ -874,7 +1038,7 @@ void Algorithms::deletePumpingStation(Graph *graph) {
     std::string pumpStation = Menu::getInput("Code of pumping station to remove");
     Algorithms::AddSourceAndSink(graph);
     Algorithms::SetFlowToZero(graph);
-    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph); //all my edmonds-karp are failing, for some reason...
+    Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph);
     auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,pumpStation);
 
@@ -985,7 +1149,7 @@ void Algorithms::AddSourceAndSink(Graph* graph)
                 incomingFlow+=edge->getFlow();
             }
 
-            graph->addEdge(v->getCode(), "Sink", INT_MAX);
+            graph->addEdge(v->getCode(), "Sink", ((City*)v)->getDemand());
             for (Edge* edge: v->getAdj()) {
                 if(edge->getDest()->getCode()=="Sink")
                 {

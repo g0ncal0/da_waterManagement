@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['setflowtozero_0',['SetFlowToZero',['../class_algorithms.html#afb2b4b3375b3295fdf4323c856583258',1,'Algorithms']]],
-  ['station_1',['Station',['../class_station.html',1,'']]]
+  ['removeedge_27',['removeEdge',['../class_graph.html#a2fd2bc1df3692a7651a854be7dbca45e',1,'Graph']]],
+  ['removesourceandsink_28',['RemoveSourceAndSink',['../class_algorithms.html#a54920fc67976dc38d4dced9bf451d1d2',1,'Algorithms']]],
+  ['reservoir_29',['Reservoir',['../class_reservoir.html',1,'']]]
 ];

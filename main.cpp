@@ -8,7 +8,7 @@ using namespace std;
 int main() {
 
 
-    int m = Menu::getNumber("Choose model to work on. MADEIRA: 0; PT: 1");
+    int m = Menu::getNumber("Choose model to work on. MADEIRA: 0; PT: 1  ");
     Graph *graph;
     try {
         Parser p;
@@ -52,7 +52,7 @@ int main() {
                 Menu::printCities(Algorithms::CitiesWithNotEnoughWater(graph), "These are the cities with not enough water");
                 break;
             case 4:
-                Algorithms::BalanceTheLoad(graph);
+                Algorithms::ChooseBalanceTheLoad(graph);
                 break;
             case 5:
                 Algorithms::shutDownReservoir(graph);
