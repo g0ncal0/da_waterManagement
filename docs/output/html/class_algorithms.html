@@ -121,8 +121,11 @@ Output: If successful, nothing is printed Complexity: In the worst case, it coul
 <tr class="memitem:a8d8521fdfc592e6e5a5f5c79963222d2"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="struct_city_water_loss.html">CityWaterLoss</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_algorithms.html#a8d8521fdfc592e6e5a5f5c79963222d2">CanDeletePumpingStationFrom0</a> (<a class="el" href="class_graph.html">Graph</a> *graph, const std::string &amp;stationCode)</td></tr>
 <tr class="memdesc:a8d8521fdfc592e6e5a5f5c79963222d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function calculates the change in water reaching the cities when a pumping station is removed. It runs the Edmonds-Karp algorithm from the beginning. Output: If successful, nothing is printed Complexity: O(V * E^2)  <a href="class_algorithms.html#a8d8521fdfc592e6e5a5f5c79963222d2">More...</a><br /></td></tr>
 <tr class="separator:a8d8521fdfc592e6e5a5f5c79963222d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24118a44b9db10f7ee5762e2b149bb72"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; <a class="el" href="struct_water_loss_on_pipe_delete.html">WaterLossOnPipeDelete</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_algorithms.html#a24118a44b9db10f7ee5762e2b149bb72">criticalPipelines</a> (<a class="el" href="class_graph.html">Graph</a> *graph)</td></tr>
-<tr class="separator:a24118a44b9db10f7ee5762e2b149bb72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a989d77a6702888a6614ca8c2c22198ef"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_algorithms.html#a989d77a6702888a6614ca8c2c22198ef">criticalPipelines</a> (<a class="el" href="class_graph.html">Graph</a> *graph)</td></tr>
+<tr class="separator:a989d77a6702888a6614ca8c2c22198ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f0f3304ee97676dd3ac12f83733bd0c"><td class="memItemLeft" align="right" valign="top"><a id="a7f0f3304ee97676dd3ac12f83733bd0c"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>PipelineDeletionImpact</b> (<a class="el" href="class_graph.html">Graph</a> *graph)</td></tr>
+<tr class="separator:a7f0f3304ee97676dd3ac12f83733bd0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
@@ -602,8 +605,8 @@ Complexity: In the worst case, it could be the same as running the Edmonds-Karp 
 
 </div>
 </div>
-<a id="a24118a44b9db10f7ee5762e2b149bb72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24118a44b9db10f7ee5762e2b149bb72">&#9670;&nbsp;</a></span>criticalPipelines()</h2>
+<a id="a989d77a6702888a6614ca8c2c22198ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a989d77a6702888a6614ca8c2c22198ef">&#9670;&nbsp;</a></span>criticalPipelines()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -612,7 +615,7 @@ Complexity: In the worst case, it could be the same as running the Edmonds-Karp 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="struct_water_loss_on_pipe_delete.html">WaterLossOnPipeDelete</a> &gt; Algorithms::criticalPipelines </td>
+          <td class="memname">void Algorithms::criticalPipelines </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_graph.html">Graph</a> *&#160;</td>
           <td class="paramname"><em>graph</em></td><td>)</td>
@@ -631,7 +634,6 @@ Complexity: In the worst case, it could be the same as running the Edmonds-Karp 
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
 </div>
 </div>
