@@ -1246,6 +1246,7 @@ void Algorithms::criticalPipelines(Graph* graph) {
  */
 void updateFollowingPaths(int howmuch, Vertex* current){
 
+
     // Check if current is valid
     if(current->getType() == 'r'){
         return;
@@ -1254,27 +1255,30 @@ void updateFollowingPaths(int howmuch, Vertex* current){
 
     // Set current to howmuch
     if(current->getNeedLack() + howmuch < 0){
-        Menu::print("SOMETHING IS SERIOUSLY WRONG WITH THIS. RESULTS MAY NOT BE PRECISE");
+        current->setNeedLack(0);
+    }else{
+        current->setNeedLack(current->getNeedLack() + howmuch);
     }
-    current->setNeedLack(current->getNeedLack() + howmuch);
 
 
-    // Iterate over all adjacent - and updateFollowing(max(edge->flow, howmuch), edge->dest)
+    // Iterate over all adjacent - and updateFollowing(min(edge->flow, howmuch), edge->dest)
     for(Edge* adj : current->getAdj()){
         if(!adj->getDest()->isVisited()){
-            updateFollowingPaths(std::min( (int) adj->getFlow(), howmuch), adj->getDest());
+            if(std::min((int) adj->getFlow(), howmuch) != 0){
+                updateFollowingPaths(std::min( (int) adj->getFlow(), howmuch), adj->getDest());
+            }
         }
     }
 
 }
 
-bool findPath(Vertex* searching, int* howmuch){
+bool findPath(Vertex* searching, int* howmuch, int allowed){
 
     searching->setVisited(true);
 
     if(searching->getNeedLack() != 0){
         // We will remove from search the amount of water we were already able to take somewhere (where needed)
-        int update = std::min(*howmuch, searching->getNeedLack());
+        int update = std::min(*howmuch, std::min((int)(searching->getNeedLack()), allowed));
         *howmuch -= update;
 
         // if I found something, update following paths with negative.
@@ -1282,9 +1286,9 @@ bool findPath(Vertex* searching, int* howmuch){
     }
 
     for(Edge* e : searching->getAdj()){
-        if(e->touse){
+        if(e->isSelected()){
             if(*howmuch > 0 && !(e->getDest()->isVisited())){
-                findPath(e->getDest(), howmuch);
+                findPath(e->getDest(), howmuch, std::min(allowed, (int)( e->getCapacity() - e->getFlow())));
             }
         }
     }
@@ -1298,10 +1302,14 @@ bool findPath(Vertex* searching, int* howmuch){
 
 
 void Algorithms::PipelineDeletionImpact(Graph* graph){
-    Menu::print("This algorithm is only valid for directed pipelines. If your pipeline is bidirectional, please run this algorithm twice with both directions.");
     // FINDING PIPELINE THAT IT REFERS TO
+    Menu::print("To guarantee good results, run Edmonds Karp before this algorithm!");
+
     std::string pipeorigin = Menu::getInput("Code of origin of pipe:");
-    std::string pipeend = Menu::getInput("Code of destination of pipe");
+    Menu::print("Code of destination of pipe");
+    // A minor bug forces us to use input this way.
+    std::string pipeend;
+    std::cin >> pipeend;
 
     Vertex* origin = graph->findVertex(pipeorigin);
     Vertex* dest = nullptr;
@@ -1320,7 +1328,7 @@ void Algorithms::PipelineDeletionImpact(Graph* graph){
         Menu::print("ERROR: NOT FOUND");
         return;
     }
-    pipeline->touse = false;
+    pipeline->setSelected(true);
 
     for(Vertex* v :graph->getVertexSet()){
         v->setVisited(false);
@@ -1335,23 +1343,29 @@ void Algorithms::PipelineDeletionImpact(Graph* graph){
     // find paths from past
     int qty = pipeline->getFlow();
 
-    if(findPath(origin, &qty)){
-        Menu::print("We found a way.");
+    if(findPath(origin, &qty, pipeline->getFlow())){
+        Menu::print("We were able to find a way of redestributing the water using the simple algorithm.");
+        Menu::print("We have reasons to believe this edge is not critical.");
     }else {
-        Menu::print("We didn't find a way..");
-        std::cout << "remains " << qty << " lt of water.";
+        Menu::print("We were NOT able to find a way of redestributing the water using the simple algorithm.");
+        std::cout << "It remains " << qty << " lt of water to reach cities. ";
 
         Menu::print("These are the cities we have reasons to believe will be affected:");
         for(Vertex* v: graph->getVertexSet()){
             if(v->getType() == 'c'){
                 City* c = (City*) v;
                 if(v->getNeedLack() > 0){
-                    Menu::print(v->getCode() + " (" + c->getName() + ") : " + (string)v->getNeedLack());
+                    std::cout << v->getCode() + " (" + c->getName() + ") | MAX AMOUNT OF LOSS: " << v->getNeedLack() << "l \n";
                 }
             }
         }
 
+        Menu::print("We will run Edmonds Karp for test.");
+        pipeline->setCapacity(0);
+        Algorithms::simpleEdmondsKarp(graph);
 
+        Menu::print("This are the resulting cities with not enough water");
+        Menu::printCities(Algorithms::CitiesWithNotEnoughWater(graph));
     }
 
 

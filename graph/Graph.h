@@ -52,7 +52,7 @@ protected:
 
 public:
     int getNeedLack(){return howmuchlacks;}
-    void setNeedLack(int n){howmuchlacks = n;}
+    void setNeedLack(int n){this->howmuchlacks = n;}
     virtual ~Vertex(){return;};
     // todo: this isn't supposed to copy edges or anything with pointers, just the rest.
     virtual Vertex* clone()const =0;
@@ -141,10 +141,8 @@ protected:
     Vertex *orig;
     Edge *reverse = nullptr;
 
-
     double flow = 0; // for flow-related problems
 public:
-    bool touse = true;
     Edge(Vertex *orig, Vertex *dest, double capacity);
 
     std::string getCode() const{
@@ -160,6 +158,7 @@ public:
     void setSelected(bool selected);
     void setReverse(Edge *reverse);
     void setFlow(double flow);
+    void setCapacity(double cap){this->capacity = cap;}
 
 
 };
