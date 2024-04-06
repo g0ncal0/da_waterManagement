@@ -1041,8 +1041,7 @@ void checkcritical(Vertex* vertex, int required, vector<Edge*>* vector){
 
 
 
-std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
-    std::vector<WaterLossOnPipeDelete> res;
+void Algorithms::criticalPipelines(Graph* graph) {
     std::unordered_map<City*, double> originalWaterValue;
 
 
@@ -1074,8 +1073,126 @@ std::vector<WaterLossOnPipeDelete> Algorithms::criticalPipelines(Graph* graph) {
             }
         }
     }
-    return res;
 }
+
+/**
+ * Update vertexes that are after current vertex, by the min of howmuch and the flow of the edge to that vertex
+ * @param howmuch
+ * @param current the vertex to start analysing
+ */
+void updateFollowingPaths(int howmuch, Vertex* current){
+
+    // Check if current is valid
+    if(current->getType() == 'r'){
+        return;
+    }
+    current->setVisited(true);
+
+    // Set current to howmuch
+    if(current->getNeedLack() + howmuch < 0){
+        Menu::print("SOMETHING IS SERIOUSLY WRONG WITH THIS. RESULTS MAY NOT BE PRECISE");
+    }
+    current->setNeedLack(current->getNeedLack() + howmuch);
+
+
+    // Iterate over all adjacent - and updateFollowing(max(edge->flow, howmuch), edge->dest)
+    for(Edge* adj : current->getAdj()){
+        if(!adj->getDest()->isVisited()){
+            updateFollowingPaths(std::min( (int) adj->getFlow(), howmuch), adj->getDest());
+        }
+    }
+
+}
+
+bool findPath(Vertex* searching, int* howmuch){
+
+    searching->setVisited(true);
+
+    if(searching->getNeedLack() != 0){
+        // We will remove from search the amount of water we were already able to take somewhere (where needed)
+        int update = std::min(*howmuch, searching->getNeedLack());
+        *howmuch -= update;
+
+        // if I found something, update following paths with negative.
+        updateFollowingPaths(-update, searching); // this will update all vertexes reached by that vertex
+    }
+
+    for(Edge* e : searching->getAdj()){
+        if(e->touse){
+            if(*howmuch > 0 && !(e->getDest()->isVisited())){
+                findPath(e->getDest(), howmuch);
+            }
+        }
+    }
+
+    if(*howmuch == 0){
+        return true;
+    }
+
+    return false;
+}
+
+
+void Algorithms::PipelineDeletionImpact(Graph* graph){
+    Menu::print("This algorithm is only valid for directed pipelines. If your pipeline is bidirectional, please run this algorithm twice with both directions.");
+    // FINDING PIPELINE THAT IT REFERS TO
+    std::string pipeorigin = Menu::getInput("Code of origin of pipe:");
+    std::string pipeend = Menu::getInput("Code of destination of pipe");
+
+    Vertex* origin = graph->findVertex(pipeorigin);
+    Vertex* dest = nullptr;
+    Edge* pipeline = nullptr;
+    if(origin == nullptr){
+        Menu::print("ERROR: Origin not found");
+        return;
+    }
+    for(Edge* e : origin->getAdj()){
+        if(e->getDest()->getCode() == pipeend){
+            dest = e->getDest();
+            pipeline = e;
+        }
+    }
+    if(dest == nullptr){
+        Menu::print("ERROR: NOT FOUND");
+        return;
+    }
+    pipeline->touse = false;
+
+    for(Vertex* v :graph->getVertexSet()){
+        v->setVisited(false);
+    }
+    updateFollowingPaths(pipeline->getFlow(), dest);
+
+
+    for(Vertex* v :graph->getVertexSet()){
+        v->setVisited(false);
+    }
+
+    // find paths from past
+    int qty = pipeline->getFlow();
+
+    if(findPath(origin, &qty)){
+        Menu::print("We found a way.");
+    }else {
+        Menu::print("We didn't find a way..");
+        std::cout << "remains " << qty << " lt of water.";
+
+        Menu::print("These are the cities we have reasons to believe will be affected:");
+        for(Vertex* v: graph->getVertexSet()){
+            if(v->getType() == 'c'){
+                City* c = (City*) v;
+                if(v->getNeedLack() > 0){
+                    Menu::print(v->getCode() + " (" + c->getName() + ") : " + (string)v->getNeedLack());
+                }
+            }
+        }
+
+
+    }
+
+
+}
+
 
 void Algorithms::SetFlowToZero(Graph* graph)
 {

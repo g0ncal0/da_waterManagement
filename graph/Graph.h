@@ -48,8 +48,11 @@ protected:
     Edge *path = nullptr;
     std::vector<Edge *> incoming;
     std::string code;
+    int howmuchlacks = 0; // FOR THE REMOVAL OF EDGES (see algorithm)
 
 public:
+    int getNeedLack(){return howmuchlacks;}
+    void setNeedLack(int n){howmuchlacks = n;}
     virtual ~Vertex(){return;};
     // todo: this isn't supposed to copy edges or anything with pointers, just the rest.
     virtual Vertex* clone()const =0;
@@ -141,12 +144,13 @@ protected:
 
     double flow = 0; // for flow-related problems
 public:
+    bool touse = true;
     Edge(Vertex *orig, Vertex *dest, double capacity);
 
     std::string getCode() const{
         return "PP" + orig->getCode() + dest->getCode();
     }
-    Vertex * getDest() const;
+    Vertex *getDest() const;
     double getCapacity() const;
     bool isSelected() const;
     Vertex * getOrig() const;

@@ -120,9 +120,11 @@ public:
     /**
      * Check critical pipelines by city. Uses a recursive algorithm that finds pipes that are likely to be critical. O(V * (V + E)).
      * @param graph
-     * @return
      */
-    static std::vector<WaterLossOnPipeDelete> criticalPipelines(Graph* graph);
+    static void criticalPipelines(Graph* graph);
+
+    static void PipelineDeletionImpact(Graph* graph);
+
     // ------------------------------------------------------------
     protected:
     /** @brief This helper function removes the super-source and super-sink vertices. \n

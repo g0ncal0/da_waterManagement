@@ -63,6 +63,9 @@ int main() {
             case 7:
                 Algorithms::criticalPipelines(graph);
                 break;
+            case 8:
+                Algorithms::PipelineDeletionImpact(graph);
+                break;
             case 9:
                 Menu::printEdges(graph, Menu::getInput("Do you want to choose a specific origin? Insert the code of origin or NULL."));
                 break;
