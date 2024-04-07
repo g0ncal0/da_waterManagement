@@ -53,12 +53,15 @@ int main() {
                 break;
             case 4:
                 Algorithms::ChooseBalanceTheLoad(graph);
+                Algorithms::ResetGraph(graph);
                 break;
             case 5:
                 Algorithms::shutDownReservoir(graph);
+                Algorithms::ResetGraph(graph);
                 break;
             case 6:
                 Algorithms::deletePumpingStation(graph);
+                Algorithms::ResetGraph(graph);
                 break;
             case 7:
                 Algorithms::criticalPipelines(graph);

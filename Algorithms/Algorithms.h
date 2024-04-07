@@ -176,6 +176,7 @@ public:
     static void criticalPipelines(Graph* graph);
 
     static void PipelineDeletionImpact(Graph* graph);
+    static void ResetGraph(Graph* g);
 
     // ------------------------------------------------------------
     protected:

@@ -1431,3 +1431,7 @@ void Algorithms::RemoveSourceAndSink(Graph* g)
     g->removeVertex(g->findVertex("Sink"));
     g->removeVertex(g->findVertex("Source"));
 }
+
+void Algorithms::ResetGraph(Graph* g) {
+    Algorithms::simpleEdmondsKarp(g);
+}
