@@ -1364,7 +1364,7 @@ void Algorithms::PipelineDeletionImpact(Graph* graph){
         pipeline->setCapacity(0);
         Algorithms::simpleEdmondsKarp(graph);
 
-        Menu::print("This are the resulting cities with not enough water");
+        Menu::print("These are the resulting cities with not enough water");
         Menu::printCities(Algorithms::CitiesWithNotEnoughWater(graph));
     }
 
