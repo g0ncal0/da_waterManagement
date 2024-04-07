@@ -809,7 +809,11 @@ void Algorithms::shutDownReservoir(Graph* graph){
     Algorithms::AddSourceAndSink(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph); // must be called for the non-optimized algorithm
-    auto res1= Algorithms::CanShutDownReservoir(graph,reservTOREMOVE);
+
+
+    auto res1= Algorithms::CanShutDownReservoirOptimized(graph,reservTOREMOVE);
+
+
 
     // To display to user
     std::stringstream re;
@@ -821,6 +825,10 @@ void Algorithms::shutDownReservoir(Graph* graph){
         }
     }
 
+    if (re.str()=="")
+    {
+        re<<"The water delivery wasn't affected!";
+    }
     Menu::print(re.str());
     Algorithms::RemoveSourceAndSink(graph);
 }
@@ -1040,13 +1048,43 @@ void Algorithms::deletePumpingStation(Graph *graph) {
     Algorithms::SetFlowToZero(graph);
     Algorithms::simpleEdmondsKarpThatDoesntDeleteSourceAndSink(graph);
     Algorithms::calculateWaterInCities(graph);
+    /*
+    for (Vertex* vert:graph->getVertexSet()) {
+        for (Edge* edge: vert->getAdj()) {
+            if (edge->getReverse())
+            {
+                if(edge->getFlow()&&edge->getReverse()->getFlow())
+                {
+                    cout<<"Error!!\n";
+                }
+            }
+        }
+    }
+*/
     auto res3=Algorithms::CanDeletePumpingStationOptimized(graph,pumpStation);
+/*
+    for (Vertex* vert:graph->getVertexSet()) {
+        for (Edge* edge: vert->getAdj()) {
+            if (edge->getReverse())
+            {
+                if(edge->getFlow()&&edge->getReverse()->getFlow())
+                {
+                    cout<<"Error!!\n";
+                }
+            }
+        }
+    }
+*/
 
     std::stringstream stream;
     for (auto& r1:res3) {
             if (r1.waterLoss != 0) {
                 stream << "Difference found: " << r1.cityCode << ", "<<r1.waterLoss<< "\n";
             }
+    }
+    if (stream.str()=="")
+    {
+        stream<<"The water delivery wasn't affected!";
     }
     Menu::print(stream.str());
 
