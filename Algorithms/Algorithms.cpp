@@ -1324,7 +1324,7 @@ bool findPath(Vertex* searching, int* howmuch, int allowed){
     }
 
     for(Edge* e : searching->getAdj()){
-        if(e->isSelected()){
+        if(!e->isSelected()){
             if(*howmuch > 0 && !(e->getDest()->isVisited())){
                 findPath(e->getDest(), howmuch, std::min(allowed, (int)( e->getCapacity() - e->getFlow())));
             }
@@ -1393,14 +1393,20 @@ void Algorithms::PipelineDeletionImpact(Graph* graph){
             if(v->getType() == 'c'){
                 City* c = (City*) v;
                 if(v->getNeedLack() > 0){
-                    std::cout << v->getCode() + " (" + c->getName() + ") | MAX AMOUNT OF LOSS: " << v->getNeedLack() << "l \n";
+                    std::cout << v->getCode() + " (" + c->getName() + ")\n";
                 }
             }
         }
+        for(Vertex* v : graph->getVertexSet()){
+            v->setNeedLack(0);
+            v->setVisited(false);
+        }
 
+        int capacity = pipeline->getCapacity();
         Menu::print("We will run Edmonds Karp for test.");
         pipeline->setCapacity(0);
         Algorithms::simpleEdmondsKarp(graph);
+        pipeline->setCapacity(capacity);
 
         Menu::print("These are the resulting cities with not enough water");
         Menu::printCities(Algorithms::CitiesWithNotEnoughWater(graph));
