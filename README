@@ -1,7 +1,6 @@
+# Water Management
 
+A C++ program to manage water in Portugal
 
-- The parser isn't tested. Also, I think I'll need to change some things with the >>, because I'm not skipping the commas in subsequent >> reads for ints, when I think I should.
-
-- Some functions have been implemented as return 0 meaning success. Maybe this isn't consistent with some others...
-
+More information in the PDF
 
